@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Home, Users, CheckSquare, Calendar, Settings, Menu, X } from "lucide-react"
+import { Home, Users, CheckSquare, Calendar, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function SimpleMobileNav() {
@@ -36,16 +36,9 @@ export function SimpleMobileNav() {
       icon: Calendar,
       active: pathname === "/schedule" || pathname.startsWith("/schedule/"),
     },
-    {
-      href: "/settings",
-      label: "Settings",
-      icon: Settings,
-      active: pathname === "/settings",
-    },
   ]
 
   const toggleMenu = () => {
-    console.log("Simple menu toggle clicked, current state:", isOpen)
     setIsOpen(!isOpen)
   }
 

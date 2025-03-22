@@ -13,17 +13,18 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
+    /* Changed from blue to green */
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 120 5% 96%;
+    --secondary-foreground: 142 30% 20%;
 
-    --muted: 210 40% 96.1%;
+    --muted: 120 5% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 120 5% 96%;
+    --accent-foreground: 142 30% 20%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -31,9 +32,13 @@
     --success: 142.1 76.2% 36.3%;
     --success-foreground: 355.7 100% 97.3%;
 
+    /* Add amber/yellow for pending status */
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --ring: 142 76% 36%;
 
     --radius: 0.5rem;
   }
@@ -48,16 +53,17 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Changed from blue to green */
+    --primary: 142 70% 45%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 142 30% 15%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
+    --muted: 142 30% 15%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 142 30% 15%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -66,9 +72,13 @@
     --success: 142.1 70.6% 45.3%;
     --success-foreground: 144.9 80.4% 10%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    /* Add amber/yellow for pending status in dark mode */
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 15%;
+
+    --border: 142 30% 15%;
+    --input: 142 30% 15%;
+    --ring: 142 70% 45%;
   }
 }
 
@@ -85,18 +95,34 @@
   .badge-success {
     @apply bg-success text-success-foreground hover:bg-success/80;
   }
-}
 
-/* Add a simple dark mode toggle for debugging */
-.dark-mode-toggle {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 1000;
-  padding: 10px;
-  background: #333;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
+  /* Add explicit calendar styles to override any potential conflicts */
+  .rdp-months {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rdp-month {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rdp-table {
+    width: 100%;
+  }
+
+  .rdp-head_row {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+  }
+
+  .rdp-row {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+  }
+
+  .rdp-cell {
+    text-align: center;
+  }
 }
 

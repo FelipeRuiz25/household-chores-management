@@ -26,14 +26,10 @@ export function ModeToggle() {
     // Set initial theme based on system or saved preference
     const initialTheme = theme || (isDarkMode ? "dark" : "light")
     toggleDarkClass(initialTheme)
-
-    // Log for debugging
-    console.log("Theme initialized:", initialTheme)
   }, [theme])
 
   // Custom theme setter that also toggles the class
   const handleSetTheme = (newTheme: string) => {
-    console.log("Setting theme to:", newTheme)
     setTheme(newTheme)
     toggleDarkClass(newTheme)
   }

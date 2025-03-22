@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Home, Users, CheckSquare, Calendar, Settings } from "lucide-react"
+import { Home, Users, CheckSquare, Calendar } from "lucide-react"
 
 export function MainNav() {
   const pathname = usePathname()
@@ -32,12 +32,6 @@ export function MainNav() {
       label: "Schedule",
       icon: Calendar,
       active: pathname === "/schedule" || pathname.startsWith("/schedule/"),
-    },
-    {
-      href: "/settings",
-      label: "Settings",
-      icon: Settings,
-      active: pathname === "/settings",
     },
   ]
 

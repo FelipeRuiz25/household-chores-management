@@ -14,6 +14,10 @@ import * as z from "zod"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Save } from "lucide-react"
 import Link from "next/link"
+import { SimpleDatePickerV2 } from "@/components/ui/simple-date-picker-v2"
+import { useChores } from "@/contexts/chores-context"
+import { useToast } from "@/hooks/use-toast"
+import { useUsers } from "@/contexts/users-context"
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -28,13 +32,21 @@ const formSchema = z.object({
   assignedTo: z.string({
     required_error: "Please select a family member.",
   }),
-  dueDate: z.string().min(1, {
-    message: "Please select a due date.",
+  dueDate: z.date({
+    required_error: "Please select a due date.",
   }),
+  priority: z
+    .string({
+      required_error: "Please select a priority level.",
+    })
+    .default("medium"),
 })
 
 export function NewChorePage() {
   const router = useRouter()
+  const { toast } = useToast()
+  const { addChore } = useChores()
+  const { users } = useUsers()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -44,28 +56,58 @@ export function NewChorePage() {
       description: "",
       frequency: "",
       assignedTo: "",
-      dueDate: "",
+      dueDate: undefined,
+      priority: "medium",
     },
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true)
-    // In a real app, you would save the data to your backend here
-    console.log(values)
 
-    // Simulate API call
+    // Find the assigned user
+    const assignedUser = users.find((user) => user.id.toString() === values.assignedTo)
+
+    if (!assignedUser) {
+      toast({
+        title: "Error",
+        description: "Selected user not found.",
+        variant: "destructive",
+      })
+      setIsSubmitting(false)
+      return
+    }
+
+    // Add the new chore
+    const newChore = addChore({
+      name: values.name,
+      description: values.description,
+      frequency: values.frequency,
+      dueDate: values.dueDate.toISOString().split("T")[0],
+      assignedTo: {
+        name: assignedUser.name,
+        avatar: assignedUser.avatar || "/placeholder.svg",
+        initials: assignedUser.initials || assignedUser.name.substring(0, 2).toUpperCase(),
+      },
+      priority: values.priority,
+    })
+
+    // Show success toast
+    toast({
+      title: "Chore added",
+      description: `${values.name} has been added successfully.`,
+      action: (
+        <Button variant="outline" size="sm" onClick={() => router.push(`/chores`)}>
+          View All
+        </Button>
+      ),
+    })
+
+    // Navigate back to chores page
     setTimeout(() => {
       setIsSubmitting(false)
       router.push("/chores")
-    }, 1000)
+    }, 500)
   }
-
-  const familyMembers = [
-    { id: "1", name: "Alex Johnson" },
-    { id: "2", name: "Sam Lee" },
-    { id: "3", name: "Jamie Davis" },
-    { id: "4", name: "Taylor Smith" },
-  ]
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -124,19 +166,19 @@ export function NewChorePage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Frequency</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
+                        <FormControl>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <SelectTrigger>
                               <SelectValue placeholder="Select frequency" />
                             </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="daily">Daily</SelectItem>
-                            <SelectItem value="weekly">Weekly</SelectItem>
-                            <SelectItem value="biweekly">Bi-weekly</SelectItem>
-                            <SelectItem value="monthly">Monthly</SelectItem>
-                          </SelectContent>
-                        </Select>
+                            <SelectContent>
+                              <SelectItem value="Daily">Daily</SelectItem>
+                              <SelectItem value="Weekly">Weekly</SelectItem>
+                              <SelectItem value="Bi-weekly">Bi-weekly</SelectItem>
+                              <SelectItem value="Monthly">Monthly</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -148,39 +190,67 @@ export function NewChorePage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Assign To</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
+                        <FormControl>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <SelectTrigger>
                               <SelectValue placeholder="Select family member" />
                             </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {familyMembers.map((member) => (
-                              <SelectItem key={member.id} value={member.id}>
-                                {member.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                            <SelectContent>
+                              {users.map((user) => (
+                                <SelectItem key={user.id} value={user.id.toString()}>
+                                  {user.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="priority"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Priority</FormLabel>
+                        <FormControl>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select priority" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="low">Low</SelectItem>
+                              <SelectItem value="medium">Medium</SelectItem>
+                              <SelectItem value="high">High</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="dueDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Due Date</FormLabel>
+                        <FormControl>
+                          <SimpleDatePickerV2
+                            date={field.value}
+                            setDate={(date) => {
+                              field.onChange(date)
+                            }}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-
-                <FormField
-                  control={form.control}
-                  name="dueDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Due Date</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </CardContent>
               <CardFooter>
                 <Button type="submit" disabled={isSubmitting} className="w-full">

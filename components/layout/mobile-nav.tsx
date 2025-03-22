@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Home, Users, CheckSquare, Calendar, Settings, Menu } from "lucide-react"
+import { Home, Users, CheckSquare, Calendar, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
@@ -12,14 +12,12 @@ export function MobileNav() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
-  // Add console log when open state changes
-  useEffect(() => {
-    console.log("Mobile menu state:", open ? "open" : "closed")
-  }, [open])
-
   const handleOpenChange = (newOpen: boolean) => {
-    console.log("Menu click detected! Setting open to:", newOpen)
     setOpen(newOpen)
+  }
+
+  const handleButtonClick = () => {
+    setOpen(true)
   }
 
   const routes = [
@@ -47,19 +45,7 @@ export function MobileNav() {
       icon: Calendar,
       active: pathname === "/schedule" || pathname.startsWith("/schedule/"),
     },
-    {
-      href: "/settings",
-      label: "Settings",
-      icon: Settings,
-      active: pathname === "/settings",
-    },
   ]
-
-  // Let's also add a direct click handler to the button as a fallback
-  const handleButtonClick = () => {
-    console.log("Button clicked directly!")
-    setOpen(true)
-  }
 
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
@@ -83,7 +69,6 @@ export function MobileNav() {
                   route.active ? "text-primary" : "text-muted-foreground",
                 )}
                 onClick={() => {
-                  console.log("Navigation link clicked, closing menu")
                   setOpen(false)
                 }}
               >

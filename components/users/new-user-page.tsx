@@ -13,6 +13,8 @@ import * as z from "zod"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Save } from "lucide-react"
 import Link from "next/link"
+import { useToast } from "@/hooks/use-toast"
+import { useUsers } from "@/contexts/users-context"
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -28,6 +30,8 @@ const formSchema = z.object({
 
 export function NewUserPage() {
   const router = useRouter()
+  const { toast } = useToast()
+  const { addUser } = useUsers()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -41,14 +45,21 @@ export function NewUserPage() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true)
-    // In a real app, you would save the data to your backend here
-    console.log(values)
 
-    // Simulate API call
+    // Add the new user to our context
+    addUser(values)
+
+    // Show success toast
+    toast({
+      title: "Family member added",
+      description: `${values.name} has been added successfully.`,
+    })
+
+    // Navigate back to users page
     setTimeout(() => {
       setIsSubmitting(false)
       router.push("/users")
-    }, 1000)
+    }, 500)
   }
 
   return (

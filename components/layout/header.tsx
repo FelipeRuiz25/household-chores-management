@@ -1,6 +1,5 @@
 import { MainNav } from "@/components/layout/main-nav"
 import { ModeToggle } from "@/components/mode-toggle"
-import { UserNav } from "@/components/layout/user-nav"
 import { MobileNav } from "@/components/layout/mobile-nav"
 
 export function Header() {
@@ -8,9 +7,7 @@ export function Header() {
     <header className="border-b">
       <div className="flex h-16 items-center px-4">
         <div className="flex items-center">
-          {/* Comment out one of these and use the other for testing */}
           <MobileNav />
-          {/* <SimpleMobileNav /> */}
           <span className="font-bold text-xl ml-2">ChoreTracker</span>
         </div>
         <div className="hidden lg:flex ml-6">
@@ -18,7 +15,6 @@ export function Header() {
         </div>
         <div className="ml-auto flex items-center space-x-4">
           <ModeToggle />
-          <UserNav />
         </div>
       </div>
     </header>
