@@ -28,7 +28,7 @@ const initialChores: Chore[] = [
     description: "Use the vacuum cleaner to clean the living room floor and under furniture",
     frequency: "Weekly",
     assignedTo: {
-      name: "Alex",
+      name: "Alex Johnson",
       avatar: "/placeholder.svg",
       initials: "AJ",
     },
@@ -42,7 +42,7 @@ const initialChores: Chore[] = [
     description: "Empty all trash cans and take bags to outdoor bin",
     frequency: "Daily",
     assignedTo: {
-      name: "Sam",
+      name: "Sam Lee",
       avatar: "/placeholder.svg",
       initials: "SL",
     },
@@ -56,7 +56,7 @@ const initialChores: Chore[] = [
     description: "Clean toilet, sink, shower, and floor",
     frequency: "Weekly",
     assignedTo: {
-      name: "Jamie",
+      name: "Jamie Davis",
       avatar: "/placeholder.svg",
       initials: "JD",
     },
@@ -70,7 +70,7 @@ const initialChores: Chore[] = [
     description: "Cut grass in front and back yard",
     frequency: "Bi-weekly",
     assignedTo: {
-      name: "Taylor",
+      name: "Taylor Smith",
       avatar: "/placeholder.svg",
       initials: "TS",
     },
@@ -84,7 +84,7 @@ const initialChores: Chore[] = [
     description: "Wash all dishes in the sink and load/unload dishwasher",
     frequency: "Daily",
     assignedTo: {
-      name: "Alex",
+      name: "Alex Johnson",
       avatar: "/placeholder.svg",
       initials: "AJ",
     },
@@ -134,9 +134,9 @@ export function ChoresProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <ChoresContext.Provider value={{ chores, addChore, updateChore, deleteChore, getChoreById }}>
-      {children}
-    </ChoresContext.Provider>
+      <ChoresContext.Provider value={{ chores, addChore, updateChore, deleteChore, getChoreById }}>
+        {children}
+      </ChoresContext.Provider>
   )
 }
 

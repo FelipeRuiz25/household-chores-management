@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Home, Users, CheckSquare, Calendar, Menu } from "lucide-react"
+import { Home, Users, CheckSquare, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
@@ -38,12 +38,6 @@ export function MobileNav() {
       label: "Users",
       icon: Users,
       active: pathname === "/users" || pathname.startsWith("/users/"),
-    },
-    {
-      href: "/schedule",
-      label: "Schedule",
-      icon: Calendar,
-      active: pathname === "/schedule" || pathname.startsWith("/schedule/"),
     },
   ]
 

@@ -2,7 +2,7 @@ import { Header } from "@/components/layout/header"
 import { UsersList } from "@/components/users/users-list"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
-import Link from "next/link"
+import { AddUserDialog } from "@/components/users/add-user-dialog"
 
 export function UsersPage() {
   return (
@@ -11,11 +11,13 @@ export function UsersPage() {
       <main className="flex-1 p-4 md:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <h1 className="text-2xl md:text-3xl font-bold">Family Members</h1>
-          <Button asChild>
-            <Link href="/users/new">
-              <Plus className="mr-2 h-4 w-4" /> Add Family Member
-            </Link>
-          </Button>
+          <AddUserDialog
+            trigger={
+              <Button>
+                <Plus className="mr-2 h-4 w-4" /> Add Family Member
+              </Button>
+            }
+          />
         </div>
         <UsersList />
       </main>

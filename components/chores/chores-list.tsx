@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge-custom"
@@ -43,7 +43,7 @@ const editChoreSchema = z.object({
 
 export function ChoresList() {
   const { toast } = useToast()
-  const { chores, updateChore, deleteChore } = useChores()
+  const { chores, updateChore, deleteChore, addChore } = useChores()
   const { users } = useUsers()
   const [searchTerm, setSearchTerm] = useState("")
   const [filterStatus, setFilterStatus] = useState("all")
@@ -57,6 +57,9 @@ export function ChoresList() {
   const [currentChore, setCurrentChore] = useState<Chore | null>(null)
   const [selectedUserId, setSelectedUserId] = useState<string>("")
   const [selectedChore, setSelectedChore] = useState<Chore | null>(null)
+
+  // Store the last deleted chore for undo functionality
+  const lastDeletedChoreRef = useRef<Chore | null>(null)
 
   // Edit form
   const editForm = useForm<z.infer<typeof editChoreSchema>>({
@@ -74,8 +77,8 @@ export function ChoresList() {
   // Filter chores based on search term and status
   const filteredChores = chores.filter((chore) => {
     const matchesSearch =
-      chore.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      chore.description.toLowerCase().includes(searchTerm.toLowerCase())
+        chore.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        chore.description.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = filterStatus === "all" || chore.status === filterStatus
     return matchesSearch && matchesStatus
   })
@@ -170,15 +173,12 @@ export function ChoresList() {
     setIsDeleteModalOpen(true)
   }
 
-  // Add a state to track the last deleted chore for undo functionality
-  const [lastDeletedChore, setLastDeletedChore] = useState<Chore | null>(null)
-
-  // Update the handleConfirmDelete function to store the deleted chore and show a toast with undo button
+  // Handle confirm delete with undo functionality
   const handleConfirmDelete = () => {
     if (!currentChore) return
 
     // Store the chore before deleting it
-    setLastDeletedChore({ ...currentChore })
+    lastDeletedChoreRef.current = { ...currentChore }
 
     // Remove the chore from the list
     deleteChore(currentChore.id)
@@ -189,24 +189,34 @@ export function ChoresList() {
       description: `${currentChore.name} has been deleted.`,
       variant: "default",
       action: (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            // Restore the chore if undo is clicked
-            if (lastDeletedChore) {
-              // Add the chore back (in a real app, you'd call an API)
-              updateChore(lastDeletedChore.id, lastDeletedChore)
-              setLastDeletedChore(null)
-              toast({
-                title: "Chore restored",
-                description: `${lastDeletedChore.name} has been restored.`,
-              })
-            }
-          }}
-        >
-          Undo
-        </Button>
+          <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                // Restore the chore if undo is clicked
+                if (lastDeletedChoreRef.current) {
+                  const choreToRestore = lastDeletedChoreRef.current
+                  // Add the chore back
+                  addChore({
+                    name: choreToRestore.name,
+                    description: choreToRestore.description,
+                    frequency: choreToRestore.frequency,
+                    dueDate: choreToRestore.dueDate,
+                    assignedTo: choreToRestore.assignedTo,
+                    priority: choreToRestore.priority,
+                  })
+
+                  toast({
+                    title: "Chore restored",
+                    description: `${choreToRestore.name} has been restored.`,
+                  })
+
+                  lastDeletedChoreRef.current = null
+                }
+              }}
+          >
+            Undo
+          </Button>
       ),
     })
 
@@ -216,401 +226,401 @@ export function ChoresList() {
   }
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>All Chores</CardTitle>
-          <CardDescription>Manage and track all household chores</CardDescription>
-          <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0 mt-4">
-            <Input
-              placeholder="Search chores..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-sm"
-            />
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardHeader>
-        <CardContent className="overflow-x-auto">
-          <div className="min-w-[700px]">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Frequency</TableHead>
-                  <TableHead>Assigned To</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Due Date</TableHead>
-                  <TableHead>Priority</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredChores.length === 0 ? (
+      <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>All Chores</CardTitle>
+            <CardDescription>Manage and track all household chores</CardDescription>
+            <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0 mt-4">
+              <Input
+                  placeholder="Search chores..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full sm:max-w-sm"
+              />
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardHeader>
+          <CardContent className="overflow-x-auto">
+            <div className="min-w-[700px]">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
-                      No chores found. Try adjusting your search or filter.
-                    </TableCell>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Frequency</TableHead>
+                    <TableHead>Assigned To</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Due Date</TableHead>
+                    <TableHead>Priority</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ) : (
-                  filteredChores.map((chore) => (
-                    <TableRow key={chore.id}>
-                      <TableCell className="font-medium">{chore.name}</TableCell>
-                      <TableCell>{chore.frequency}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={chore.assignedTo.avatar} alt={chore.assignedTo.name} />
-                            <AvatarFallback>{chore.assignedTo.initials}</AvatarFallback>
-                          </Avatar>
-                          <span>{chore.assignedTo.name}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={chore.status === "completed" ? "success" : "warning"}>
-                          {chore.status === "completed" ? "Completed" : "Pending"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{new Date(chore.dueDate).toLocaleDateString()}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            chore.priority === "high"
-                              ? "destructive"
-                              : chore.priority === "medium"
-                                ? "warning"
-                                : "secondary"
-                          }
-                        >
-                          {chore.priority}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <span className="sr-only">Open menu</span>
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEditChore(chore)}>
-                              <Pencil className="mr-2 h-4 w-4" />
-                              <span>Edit</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleReassignChore(chore)}>
-                              <UserPlus className="mr-2 h-4 w-4" />
-                              <span>Reassign</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDeleteChore(chore)}>
-                              <Trash className="mr-2 h-4 w-4" />
-                              <span>Delete</span>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Edit Modal */}
-      {isEditModalOpen && selectedChore && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative">
-            <button
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-              onClick={() => {
-                setIsEditModalOpen(false)
-                setCurrentChore(null)
-                editForm.reset()
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide lucide-x"
-              >
-                <path d="M18 6 6 18" />
-                <path d="m6 6 12 12" />
-              </svg>
-              <span className="sr-only">Close</span>
-            </button>
-
-            <h2 className="text-lg font-semibold mb-4">Edit Chore</h2>
-            <p className="text-sm text-muted-foreground mb-4">Make changes to the chore details below.</p>
-            <Badge
-              variant={
-                selectedChore.priority === "high"
-                  ? "destructive"
-                  : selectedChore.priority === "medium"
-                    ? "warning"
-                    : "secondary"
-              }
-              className="ml-2"
-            >
-              {selectedChore.priority}
-            </Badge>
-
-            <Form {...editForm}>
-              <form onSubmit={editForm.handleSubmit(handleSaveEdit)} className="space-y-4">
-                <FormField
-                  control={editForm.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                </TableHeader>
+                <TableBody>
+                  {filteredChores.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
+                          No chores found. Try adjusting your search or filter.
+                        </TableCell>
+                      </TableRow>
+                  ) : (
+                      filteredChores.map((chore) => (
+                          <TableRow key={chore.id}>
+                            <TableCell className="font-medium">{chore.name}</TableCell>
+                            <TableCell>{chore.frequency}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center space-x-2">
+                                <Avatar className="h-8 w-8">
+                                  <AvatarImage src={chore.assignedTo.avatar} alt={chore.assignedTo.name} />
+                                  <AvatarFallback>{chore.assignedTo.initials}</AvatarFallback>
+                                </Avatar>
+                                <span>{chore.assignedTo.name}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={chore.status === "completed" ? "success" : "warning"}>
+                                {chore.status === "completed" ? "Completed" : "Pending"}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>{new Date(chore.dueDate).toLocaleDateString()}</TableCell>
+                            <TableCell>
+                              <Badge
+                                  variant={
+                                    chore.priority === "high"
+                                        ? "destructive"
+                                        : chore.priority === "medium"
+                                            ? "warning"
+                                            : "secondary"
+                                  }
+                              >
+                                {chore.priority}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" className="h-8 w-8 p-0">
+                                    <span className="sr-only">Open menu</span>
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => handleEditChore(chore)}>
+                                    <Pencil className="mr-2 h-4 w-4" />
+                                    <span>Edit</span>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleReassignChore(chore)}>
+                                    <UserPlus className="mr-2 h-4 w-4" />
+                                    <span>Reassign</span>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleDeleteChore(chore)}>
+                                    <Trash className="mr-2 h-4 w-4" />
+                                    <span>Delete</span>
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                      ))
                   )}
-                />
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
 
-                <FormField
-                  control={editForm.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Textarea {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={editForm.control}
-                    name="frequency"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Frequency</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select frequency" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="Daily">Daily</SelectItem>
-                            <SelectItem value="Weekly">Weekly</SelectItem>
-                            <SelectItem value="Bi-weekly">Bi-weekly</SelectItem>
-                            <SelectItem value="Monthly">Monthly</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={editForm.control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Status</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select status" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="completed">Completed</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={editForm.control}
-                    name="priority"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Priority</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value || selectedChore.priority}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select priority" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="low">Low</SelectItem>
-                            <SelectItem value="medium">Medium</SelectItem>
-                            <SelectItem value="high">High</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={editForm.control}
-                    name="dueDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Due Date</FormLabel>
-                        <FormControl>
-                          <SimpleDatePickerV2
-                            date={field.value}
-                            setDate={(date) => {
-                              field.onChange(date)
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="flex justify-end gap-2 mt-6">
-                  <Button
-                    type="button"
-                    variant="outline"
+        {/* Edit Modal */}
+        {isEditModalOpen && selectedChore && (
+            <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
+              <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto">
+                <button
+                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
                     onClick={() => {
                       setIsEditModalOpen(false)
                       setCurrentChore(null)
                       editForm.reset()
                     }}
+                >
+                  <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="lucide lucide-x"
+                  >
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
+                  <span className="sr-only">Close</span>
+                </button>
+
+                <h2 className="text-lg font-semibold mb-4">Edit Chore</h2>
+                <p className="text-sm text-muted-foreground mb-4">Make changes to the chore details below.</p>
+                <Badge
+                    variant={
+                      selectedChore.priority === "high"
+                          ? "destructive"
+                          : selectedChore.priority === "medium"
+                              ? "warning"
+                              : "secondary"
+                    }
+                    className="ml-2"
+                >
+                  {selectedChore.priority}
+                </Badge>
+
+                <Form {...editForm}>
+                  <form onSubmit={editForm.handleSubmit(handleSaveEdit)} className="space-y-4">
+                    <FormField
+                        control={editForm.control}
+                        name="name"
+                        render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Name</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={editForm.control}
+                        name="description"
+                        render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Description</FormLabel>
+                              <FormControl>
+                                <Textarea {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                          control={editForm.control}
+                          name="frequency"
+                          render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Frequency</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select frequency" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="Daily">Daily</SelectItem>
+                                    <SelectItem value="Weekly">Weekly</SelectItem>
+                                    <SelectItem value="Bi-weekly">Bi-weekly</SelectItem>
+                                    <SelectItem value="Monthly">Monthly</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+
+                      <FormField
+                          control={editForm.control}
+                          name="status"
+                          render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Status</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="pending">Pending</SelectItem>
+                                    <SelectItem value="completed">Completed</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                          control={editForm.control}
+                          name="priority"
+                          render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Priority</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value || selectedChore.priority}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select priority" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="low">Low</SelectItem>
+                                    <SelectItem value="medium">Medium</SelectItem>
+                                    <SelectItem value="high">High</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+
+                      <FormField
+                          control={editForm.control}
+                          name="dueDate"
+                          render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Due Date</FormLabel>
+                                <FormControl>
+                                  <SimpleDatePickerV2
+                                      date={field.value}
+                                      setDate={(date) => {
+                                        field.onChange(date)
+                                      }}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                    </div>
+
+                    <div className="flex justify-end gap-2 mt-6">
+                      <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => {
+                            setIsEditModalOpen(false)
+                            setCurrentChore(null)
+                            editForm.reset()
+                          }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button type="submit">Save Changes</Button>
+                    </div>
+                  </form>
+                </Form>
+              </div>
+            </div>
+        )}
+
+        {/* Reassign Modal */}
+        {isReassignModalOpen && currentChore && (
+            <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
+              <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto">
+                <button
+                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                    onClick={() => {
+                      setIsReassignModalOpen(false)
+                      setCurrentChore(null)
+                      setSelectedUserId("")
+                    }}
+                >
+                  <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="lucide lucide-x"
+                  >
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
+                  <span className="sr-only">Close</span>
+                </button>
+
+                <h2 className="text-lg font-semibold mb-4">Reassign Chore</h2>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Select a new person to assign "{currentChore.name}" to.
+                </p>
+
+                <div className="grid gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="reassign-user">Assign To</Label>
+                    <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                      <SelectTrigger id="reassign-user">
+                        <SelectValue placeholder="Select person" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {users.map((user) => (
+                            <SelectItem key={user.id} value={user.id.toString()}>
+                              {user.name}
+                            </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 mt-6">
+                  <Button
+                      variant="outline"
+                      onClick={() => {
+                        setIsReassignModalOpen(false)
+                        setCurrentChore(null)
+                        setSelectedUserId("")
+                      }}
                   >
                     Cancel
                   </Button>
-                  <Button type="submit">Save Changes</Button>
+                  <Button onClick={handleSaveReassign}>Save Changes</Button>
                 </div>
-              </form>
-            </Form>
-          </div>
-        </div>
-      )}
-
-      {/* Reassign Modal */}
-      {isReassignModalOpen && currentChore && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative">
-            <button
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-              onClick={() => {
-                setIsReassignModalOpen(false)
-                setCurrentChore(null)
-                setSelectedUserId("")
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide lucide-x"
-              >
-                <path d="M18 6 6 18" />
-                <path d="m6 6 12 12" />
-              </svg>
-              <span className="sr-only">Close</span>
-            </button>
-
-            <h2 className="text-lg font-semibold mb-4">Reassign Chore</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              Select a new person to assign "{currentChore.name}" to.
-            </p>
-
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="reassign-user">Assign To</Label>
-                <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-                  <SelectTrigger id="reassign-user">
-                    <SelectValue placeholder="Select person" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {users.map((user) => (
-                      <SelectItem key={user.id} value={user.id.toString()}>
-                        {user.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
             </div>
+        )}
 
-            <div className="flex justify-end gap-2 mt-6">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsReassignModalOpen(false)
-                  setCurrentChore(null)
-                  setSelectedUserId("")
-                }}
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleSaveReassign}>Save Changes</Button>
+        {/* Delete Confirmation Modal */}
+        {isDeleteModalOpen && currentChore && (
+            <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
+              <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto">
+                <h2 className="text-lg font-semibold mb-4">Are you sure?</h2>
+                <p className="text-sm text-muted-foreground mb-4">
+                  This will permanently delete the chore "{currentChore.name}". This action cannot be undone.
+                </p>
+
+                <div className="flex justify-end gap-2 mt-6">
+                  <Button
+                      variant="outline"
+                      onClick={() => {
+                        setIsDeleteModalOpen(false)
+                        setCurrentChore(null)
+                      }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button variant="destructive" onClick={handleConfirmDelete}>
+                    Delete
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {isDeleteModalOpen && currentChore && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative">
-            <h2 className="text-lg font-semibold mb-4">Are you sure?</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              This will permanently delete the chore "{currentChore.name}". This action cannot be undone.
-            </p>
-
-            <div className="flex justify-end gap-2 mt-6">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsDeleteModalOpen(false)
-                  setCurrentChore(null)
-                }}
-              >
-                Cancel
-              </Button>
-              <Button variant="destructive" onClick={handleConfirmDelete}>
-                Delete
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
   )
 }
 

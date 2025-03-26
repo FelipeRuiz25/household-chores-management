@@ -1,88 +1,82 @@
 "use client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle, Clock, Users, Award, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { CheckCircle, Clock, Users, Award } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useChores } from "@/contexts/chores-context"
+import { useUsers } from "@/contexts/users-context"
 
 export function DashboardStats() {
-  const router = useRouter()
+    const router = useRouter()
+    const { chores } = useChores()
+    const { users } = useUsers()
 
-  return (
-    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-      <Card
-        className="cursor-pointer hover:shadow-md transition-shadow"
-        onClick={() => router.push("/chores?filter=completed")}
-      >
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Completed Chores</CardTitle>
-          <CheckCircle className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">24</div>
-          <div className="flex justify-between items-center">
-            <p className="text-xs text-muted-foreground">+5 from last week</p>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <ArrowRight className="h-4 w-4" />
-              <span className="sr-only">View completed chores</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+    // Calculate stats
+    const completedChores = chores.filter((chore) => chore.status === "completed").length
+    const pendingChores = chores.filter((chore) => chore.status === "pending").length
+    const activeUsers = users.length
 
-      <Card
-        className="cursor-pointer hover:shadow-md transition-shadow"
-        onClick={() => router.push("/chores?filter=pending")}
-      >
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Pending Chores</CardTitle>
-          <Clock className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">12</div>
-          <div className="flex justify-between items-center">
-            <p className="text-xs text-muted-foreground">-2 from last week</p>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <ArrowRight className="h-4 w-4" />
-              <span className="sr-only">View pending chores</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+    // Calculate completion rate
+    const totalChores = chores.length
+    const completionRate = totalChores > 0 ? Math.round((completedChores / totalChores) * 100) : 0
 
-      <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push("/users")}>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-          <Users className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">4</div>
-          <div className="flex justify-between items-center">
-            <p className="text-xs text-muted-foreground">All family members</p>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <ArrowRight className="h-4 w-4" />
-              <span className="sr-only">View family members</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+    // Calculate change from "last week" (simulated)
+    // In a real app, you would compare with historical data
+    const completedChange = "+5"
+    const pendingChange = "-2"
+    const completionRateChange = "+2%"
 
-      <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push("/schedule")}>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
-          <Award className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">86%</div>
-          <div className="flex justify-between items-center">
-            <p className="text-xs text-muted-foreground">+2% from last week</p>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <ArrowRight className="h-4 w-4" />
-              <span className="sr-only">View schedule</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )
+    return (
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            <Card
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => router.push("/chores?filter=completed")}
+            >
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Completed Chores</CardTitle>
+                    <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{completedChores}</div>
+                    <p className="text-xs text-muted-foreground">Total completed</p>
+                </CardContent>
+            </Card>
+
+            <Card
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => router.push("/chores?filter=pending")}
+            >
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Pending Chores</CardTitle>
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{pendingChores}</div>
+                    <p className="text-xs text-muted-foreground">Waiting to be done</p>
+                </CardContent>
+            </Card>
+
+            <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push("/users")}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{activeUsers}</div>
+                    <p className="text-xs text-muted-foreground">All family members</p>
+                </CardContent>
+            </Card>
+
+            <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
+                    <Award className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{completionRate}%</div>
+                    <p className="text-xs text-muted-foreground">Overall completion</p>
+                </CardContent>
+            </Card>
+        </div>
+    )
 }
 

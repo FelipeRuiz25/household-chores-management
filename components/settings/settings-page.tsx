@@ -173,25 +173,7 @@ export function SettingsPage() {
                 <CardDescription>Customize the look and feel of the application</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Theme</h3>
-                  <div className="space-y-2">
-                    <Label htmlFor="theme">Select Theme</Label>
-                    <Select value={theme} onValueChange={setTheme}>
-                      <SelectTrigger id="theme">
-                        <SelectValue placeholder="Select theme" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="light">Light</SelectItem>
-                        <SelectItem value="dark">Dark</SelectItem>
-                        <SelectItem value="system">System</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <p className="text-sm text-muted-foreground mt-2">Choose between light, dark, or system theme</p>
-                  </div>
-                </div>
-
-                <Separator />
+                {/* Theme selection removed - using light theme only */}
 
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium">Dashboard Layout</h3>

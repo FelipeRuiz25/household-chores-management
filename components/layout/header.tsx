@@ -1,5 +1,4 @@
 import { MainNav } from "@/components/layout/main-nav"
-import { ModeToggle } from "@/components/mode-toggle"
 import { MobileNav } from "@/components/layout/mobile-nav"
 
 export function Header() {
@@ -13,9 +12,7 @@ export function Header() {
         <div className="hidden lg:flex ml-6">
           <MainNav />
         </div>
-        <div className="ml-auto flex items-center space-x-4">
-          <ModeToggle />
-        </div>
+        <div className="ml-auto flex items-center space-x-4">{/* Light theme only */}</div>
       </div>
     </header>
   )
