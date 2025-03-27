@@ -12,8 +12,7 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
     title: "Household Chores Manager",
-    description: "Manage and track household chores and assignments",
-    generator: "v0.dev",
+    description: "Manage and track household chores and assignments"
 }
 
 export default function RootLayout({
