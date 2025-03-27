@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge-custom"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { CheckCircle, Clock, User, AlertTriangle, X, Edit, Plus } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { useChores } from "@/contexts/chores-context"
 import { AddChoreDialog } from "@/components/chores/add-chore-dialog"
@@ -21,6 +20,7 @@ import { SimpleDatePickerV2 } from "@/components/ui/simple-date-picker-v2"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import { toast } from "sonner"
 
 // Form schema for editing chores
 const editChoreSchema = z.object({
@@ -58,7 +58,6 @@ type Chore = {
 }
 
 export function UpcomingChores() {
-    const { toast } = useToast()
     const router = useRouter()
     const { chores, updateChore } = useChores()
     const { users } = useUsers()
@@ -132,10 +131,8 @@ export function UpcomingChores() {
         const chore = visibleChores.find((c) => c.id === choreId)
 
         if (chore) {
-            toast({
-                title: "Chore completed",
-                description: `"${chore.name}" has been marked as completed.`,
-                variant: "default",
+            toast.success(`"${chore.name}" has been marked as completed.`, {
+                description: "The chore has been marked as completed successfully.",
             })
         }
     }
@@ -171,10 +168,8 @@ export function UpcomingChores() {
         const originalChore = chores.find((c) => c.id === choreId)
 
         if (!originalChore) {
-            toast({
-                title: "Error",
-                description: "Chore not found.",
-                variant: "destructive",
+            toast.error("Chore not found.", {
+                description: "Could not find chore to edit.",
             })
             return
         }
@@ -211,9 +206,8 @@ export function UpcomingChores() {
 
         updateChore(editingChore.id, updatedChore)
 
-        toast({
-            title: "Chore updated",
-            description: `${values.name} has been updated successfully.`,
+        toast.success(`${values.name} has been updated successfully.`, {
+            description: "The chore has been updated.",
         })
 
         // Reset states

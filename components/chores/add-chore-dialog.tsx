@@ -15,9 +15,9 @@ import * as z from "zod"
 import { Save } from "lucide-react"
 import { SimpleDatePickerV2 } from "@/components/ui/simple-date-picker-v2"
 import { useChores } from "@/contexts/chores-context"
-import { useToast } from "@/hooks/use-toast"
 import { useUsers } from "@/contexts/users-context"
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { toast } from "sonner"
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -48,7 +48,6 @@ interface AddChoreDialogProps {
 }
 
 export function AddChoreDialog({ trigger, onChoreAdded }: AddChoreDialogProps) {
-    const { toast } = useToast()
     const { addChore } = useChores()
     const { users } = useUsers()
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -73,10 +72,8 @@ export function AddChoreDialog({ trigger, onChoreAdded }: AddChoreDialogProps) {
         const assignedUser = users.find((user) => user.id.toString() === values.assignedTo)
 
         if (!assignedUser) {
-            toast({
-                title: "Error",
+            toast.error("Error", {
                 description: "Selected user not found.",
-                variant: "destructive",
             })
             setIsSubmitting(false)
             return
@@ -97,8 +94,7 @@ export function AddChoreDialog({ trigger, onChoreAdded }: AddChoreDialogProps) {
         })
 
         // Show success toast
-        toast({
-            title: "Chore added",
+        toast.success("Chore added", {
             description: `${values.name} has been added successfully.`,
         })
 

@@ -12,7 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { Save } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import { useUsers } from "@/contexts/users-context"
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 
@@ -34,7 +34,6 @@ interface AddUserDialogProps {
 }
 
 export function AddUserDialog({ trigger, onUserAdded }: AddUserDialogProps) {
-    const { toast } = useToast()
     const { addUser } = useUsers()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [open, setOpen] = useState(false)
@@ -55,8 +54,7 @@ export function AddUserDialog({ trigger, onUserAdded }: AddUserDialogProps) {
         addUser(values)
 
         // Show success toast
-        toast({
-            title: "Family member added",
+        toast.success("Family member added", {
             description: `${values.name} has been added successfully.`,
         })
 

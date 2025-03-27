@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/sonner"
 import { UsersProvider } from "@/contexts/users-context"
 import { ChoresProvider } from "@/contexts/chores-context"
 
@@ -16,28 +16,27 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({
-  children,
-}: {
+                                     children,
+                                   }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+      <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light" disableTransitionOnChange>
-          <UsersProvider>
-            <ChoresProvider>
-              {children}
-              <Toaster />
-            </ChoresProvider>
-          </UsersProvider>
-        </ThemeProvider>
+      <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light" disableTransitionOnChange>
+        <UsersProvider>
+          <ChoresProvider>
+            {children}
+            <Toaster />
+          </ChoresProvider>
+        </UsersProvider>
+      </ThemeProvider>
       </body>
-    </html>
+      </html>
   )
 }
 
 import "./globals.css"
 
+import "./globals.css"
 
-
-import './globals.css'

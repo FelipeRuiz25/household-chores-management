@@ -10,12 +10,11 @@ import { MoreHorizontal, Pencil, Trash, Award } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import { useUsers, type User } from "@/contexts/users-context"
 import { useChores } from "@/contexts/chores-context"
 
 export function UsersList() {
-  const { toast } = useToast()
   const { users, updateUser, deleteUser, addUser } = useUsers()
   const { chores, updateChore } = useChores()
   const [displayUsers, setDisplayUsers] = useState<User[]>([])
@@ -97,8 +96,7 @@ export function UsersList() {
       })
     }
 
-    toast({
-      title: "User updated",
+    toast.success("User updated", {
       description: `${editFormData.name} has been updated successfully.`,
     })
 
@@ -125,37 +123,29 @@ export function UsersList() {
     deleteUser(currentUser.id)
 
     // Show toast with undo button
-    toast({
-      title: "User deleted",
-      description: `${currentUser.name} has been removed.`,
-      variant: "default",
-      action: (
-          <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                // Restore the user if undo is clicked
-                if (lastDeletedUserRef.current) {
-                  const userToRestore = lastDeletedUserRef.current
-                  // Add the user back to the context
-                  addUser({
-                    name: userToRestore.name,
-                    email: userToRestore.email,
-                    role: userToRestore.role,
-                  })
+    toast(`${currentUser.name} has been removed.`, {
+      description: "The family member has been deleted.",
+      action: {
+        label: "Undo",
+        onClick: () => {
+          // Restore the user if undo is clicked
+          if (lastDeletedUserRef.current) {
+            const userToRestore = lastDeletedUserRef.current
+            // Add the user back to the context
+            addUser({
+              name: userToRestore.name,
+              email: userToRestore.email,
+              role: userToRestore.role,
+            })
 
-                  toast({
-                    title: "User restored",
-                    description: `${userToRestore.name} has been restored.`,
-                  })
+            toast.success("User restored", {
+              description: `${userToRestore.name} has been restored.`,
+            })
 
-                  lastDeletedUserRef.current = null
-                }
-              }}
-          >
-            Undo
-          </Button>
-      ),
+            lastDeletedUserRef.current = null
+          }
+        },
+      },
     })
 
     // Reset states

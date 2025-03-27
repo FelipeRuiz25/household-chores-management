@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/hooks/use-toast"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -20,6 +19,7 @@ import * as z from "zod"
 import { SimpleDatePickerV2 } from "@/components/ui/simple-date-picker-v2"
 import { useChores, type Chore } from "@/contexts/chores-context"
 import { useUsers } from "@/contexts/users-context"
+import { toast } from "sonner"
 
 // Form schema for editing chores
 const editChoreSchema = z.object({
@@ -42,7 +42,7 @@ const editChoreSchema = z.object({
 })
 
 export function ChoresList() {
-  const { toast } = useToast()
+  // Remove this line as we're importing toast directly
   const { chores, updateChore, deleteChore, addChore } = useChores()
   const { users } = useUsers()
   const [searchTerm, setSearchTerm] = useState("")
@@ -123,8 +123,7 @@ export function ChoresList() {
 
     updateChore(currentChore.id, updatedChore)
 
-    toast({
-      title: "Chore updated",
+    toast.success("Chore updated", {
       description: `${values.name} has been updated successfully.`,
     })
 
@@ -162,8 +161,7 @@ export function ChoresList() {
 
     updateChore(currentChore.id, updatedChore)
 
-    toast({
-      title: "Chore reassigned",
+    toast.success("Chore reassigned", {
       description: `${updatedChore.name} has been reassigned to ${selectedUser.name}.`,
     })
 
@@ -190,40 +188,32 @@ export function ChoresList() {
     deleteChore(currentChore.id)
 
     // Show toast with undo button
-    toast({
-      title: "Chore deleted",
-      description: `${currentChore.name} has been deleted.`,
-      variant: "default",
-      action: (
-          <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                // Restore the chore if undo is clicked
-                if (lastDeletedChoreRef.current) {
-                  const choreToRestore = lastDeletedChoreRef.current
-                  // Add the chore back
-                  addChore({
-                    name: choreToRestore.name,
-                    description: choreToRestore.description,
-                    frequency: choreToRestore.frequency,
-                    dueDate: choreToRestore.dueDate,
-                    assignedTo: choreToRestore.assignedTo,
-                    priority: choreToRestore.priority,
-                  })
+    toast(`${currentChore.name} has been deleted.`, {
+      description: "The chore has been removed.",
+      action: {
+        label: "Undo",
+        onClick: () => {
+          // Restore the chore if undo is clicked
+          if (lastDeletedChoreRef.current) {
+            const choreToRestore = lastDeletedChoreRef.current
+            // Add the chore back
+            addChore({
+              name: choreToRestore.name,
+              description: choreToRestore.description,
+              frequency: choreToRestore.frequency,
+              dueDate: choreToRestore.dueDate,
+              assignedTo: choreToRestore.assignedTo,
+              priority: choreToRestore.priority,
+            })
 
-                  toast({
-                    title: "Chore restored",
-                    description: `${choreToRestore.name} has been restored.`,
-                  })
+            toast.success("Chore restored", {
+              description: `${choreToRestore.name} has been restored.`,
+            })
 
-                  lastDeletedChoreRef.current = null
-                }
-              }}
-          >
-            Undo
-          </Button>
-      ),
+            lastDeletedChoreRef.current = null
+          }
+        },
+      },
     })
 
     // Reset states
