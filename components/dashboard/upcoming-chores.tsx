@@ -297,10 +297,11 @@ export function UpcomingChores() {
             {/* Chore Details Modal */}
             {selectedChore && (
                 <div
-                    className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center"
+                    className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center overflow-y-auto"
                     aria-describedby="chore-details-description"
+                    style={{ minHeight: "100vh" }}
                 >
-                    <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto">
+                    <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative my-8 mx-auto max-h-[90vh] overflow-y-auto">
                         <button
                             className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
                             onClick={closeChoreDetails}
@@ -352,14 +353,7 @@ export function UpcomingChores() {
                             </div>
                         </div>
 
-                        <div className="flex justify-end gap-2 mt-6">
-                            <Button variant="outline" onClick={closeChoreDetails}>
-                                Close
-                            </Button>
-                            <Button variant="outline" onClick={() => handleEditChore(selectedChore.id)}>
-                                <Edit className="h-4 w-4 mr-2" />
-                                Edit
-                            </Button>
+                        <div className="flex flex-col gap-2 mt-6">
                             <Button
                                 onClick={() => {
                                     handleCompleteChore(selectedChore.id, { stopPropagation: () => {} } as React.MouseEvent)
@@ -369,6 +363,13 @@ export function UpcomingChores() {
                                 <CheckCircle className="h-4 w-4 mr-2" />
                                 Complete
                             </Button>
+                            <Button variant="outline" onClick={() => handleEditChore(selectedChore.id)}>
+                                <Edit className="h-4 w-4 mr-2" />
+                                Edit
+                            </Button>
+                            <Button variant="outline" onClick={closeChoreDetails}>
+                                Close
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -377,10 +378,11 @@ export function UpcomingChores() {
             {/* Edit Modal */}
             {isEditModalOpen && editingChore && (
                 <div
-                    className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center"
+                    className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center overflow-y-auto"
                     aria-describedby="edit-chore-description"
+                    style={{ minHeight: "100vh" }}
                 >
-                    <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto">
+                    <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative my-8 mx-auto max-h-[90vh] overflow-y-auto">
                         <button
                             className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
                             onClick={() => {

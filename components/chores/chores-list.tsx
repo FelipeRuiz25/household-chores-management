@@ -63,6 +63,7 @@ export function ChoresList() {
   const [currentChore, setCurrentChore] = useState<Chore | null>(null)
   const [selectedUserId, setSelectedUserId] = useState<string>("")
   const [selectedChore, setSelectedChore] = useState<Chore | null>(null)
+  const [editingChore, setEditingChore] = useState<Chore | null>(null)
 
   // Store the last deleted chore for undo functionality
   const lastDeletedChoreRef = useRef<Chore | null>(null)
@@ -93,6 +94,7 @@ export function ChoresList() {
   const handleEditChore = (chore: Chore) => {
     setCurrentChore({ ...chore })
     setSelectedChore({ ...chore })
+    setEditingChore({ ...chore })
 
     // Set form values
     editForm.reset({
@@ -130,6 +132,7 @@ export function ChoresList() {
     // Reset states
     setIsEditModalOpen(false)
     setCurrentChore(null)
+    setEditingChore(null)
     editForm.reset()
   }
 
@@ -422,17 +425,19 @@ export function ChoresList() {
         </Card>
 
         {/* Edit Modal */}
-        {isEditModalOpen && selectedChore && (
+        {isEditModalOpen && editingChore && (
             <div
-                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center"
+                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center overflow-y-auto"
                 aria-describedby="edit-chore-description"
+                style={{ minHeight: "100vh" }}
             >
-              <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto">
+              <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative my-8 mx-auto">
                 <button
                     className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
                     onClick={() => {
                       setIsEditModalOpen(false)
                       setCurrentChore(null)
+                      setEditingChore(null)
                       editForm.reset()
                     }}
                 >
@@ -461,48 +466,58 @@ export function ChoresList() {
                 <p className="text-sm text-muted-foreground mb-4">Make changes to the chore details below.</p>
                 <Badge
                     variant={
-                      selectedChore.priority === "high"
+                      editingChore.priority === "high"
                           ? "destructive"
-                          : selectedChore.priority === "medium"
+                          : editingChore.priority === "medium"
                               ? "warning"
                               : "secondary"
                     }
                     className="ml-2"
                 >
-                  {selectedChore.priority}
+                  {editingChore.priority}
                 </Badge>
 
                 <Form {...editForm}>
-                  <form onSubmit={editForm.handleSubmit(handleSaveEdit)} className="space-y-4">
-                    <FormField
-                        control={editForm.control}
-                        name="name"
-                        render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Name</FormLabel>
-                              <FormControl>
-                                <Input {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={editForm.control}
-                        name="description"
-                        render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Description</FormLabel>
-                              <FormControl>
-                                <Textarea {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    <div className="grid grid-cols-2 gap-4">
+                  <form onSubmit={editForm.handleSubmit(handleSaveEdit)} className="space-y-0 mt-4">
+                    {" "}
+                    {/* Changed space-y-4 to space-y-0 */}
+                    <div className="mb-4">
+                      {" "}
+                      {/* Added explicit margin to each form section */}
+                      <FormField
+                          control={editForm.control}
+                          name="name"
+                          render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Name</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                    </div>
+                    <div className="mb-4">
+                      {" "}
+                      {/* Added explicit margin */}
+                      <FormField
+                          control={editForm.control}
+                          name="description"
+                          render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Description</FormLabel>
+                                <FormControl>
+                                  <Textarea {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                    </div>
+                    <div className="mb-4">
+                      {" "}
+                      {/* Added explicit margin */}
                       <FormField
                           control={editForm.control}
                           name="frequency"
@@ -526,7 +541,10 @@ export function ChoresList() {
                               </FormItem>
                           )}
                       />
-
+                    </div>
+                    <div className="mb-4">
+                      {" "}
+                      {/* Added explicit margin */}
                       <FormField
                           control={editForm.control}
                           name="status"
@@ -549,16 +567,16 @@ export function ChoresList() {
                           )}
                       />
                     </div>
-
-                    {/* Changed from grid to flex column for priority and due date */}
-                    <div className="space-y-4">
+                    <div className="mb-4">
+                      {" "}
+                      {/* Added explicit margin */}
                       <FormField
                           control={editForm.control}
                           name="priority"
                           render={({ field }) => (
                               <FormItem>
                                 <FormLabel>Priority</FormLabel>
-                                <Select onValueChange={field.onChange} value={field.value || selectedChore.priority}>
+                                <Select onValueChange={field.onChange} value={field.value || editingChore.priority}>
                                   <FormControl>
                                     <SelectTrigger>
                                       <SelectValue placeholder="Select priority" />
@@ -574,12 +592,17 @@ export function ChoresList() {
                               </FormItem>
                           )}
                       />
-
+                    </div>
+                    <div className="mb-8">
+                      {" "}
+                      {/* Added larger margin before buttons */}
                       <FormField
                           control={editForm.control}
                           name="dueDate"
                           render={({ field }) => (
-                              <FormItem>
+                              <FormItem className="mb-6">
+                                {" "}
+                                {/* Added explicit margin to the FormItem */}
                                 <FormLabel>Due Date</FormLabel>
                                 <FormControl>
                                   <SimpleDatePickerV2
@@ -594,14 +617,16 @@ export function ChoresList() {
                           )}
                       />
                     </div>
-
                     <div className="flex flex-col gap-2 mt-6">
+                      {" "}
+                      {/* Added back the mt-6 */}
                       <Button
                           type="button"
                           variant="outline"
                           onClick={() => {
                             setIsEditModalOpen(false)
                             setCurrentChore(null)
+                            setEditingChore(null)
                             editForm.reset()
                           }}
                       >
@@ -618,10 +643,11 @@ export function ChoresList() {
         {/* Reassign Modal */}
         {isReassignModalOpen && currentChore && (
             <div
-                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center"
+                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center overflow-y-auto"
                 aria-describedby="reassign-chore-description"
+                style={{ minHeight: "100vh" }}
             >
-              <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto">
+              <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative my-8 mx-auto">
                 <button
                     className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
                     onClick={() => {
@@ -694,10 +720,11 @@ export function ChoresList() {
         {/* Delete Confirmation Modal */}
         {isDeleteModalOpen && currentChore && (
             <div
-                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center"
+                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center overflow-y-auto"
                 aria-describedby="delete-chore-description"
+                style={{ minHeight: "100vh" }}
             >
-              <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto">
+              <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative my-8 mx-auto">
                 <h2 className="text-lg font-semibold mb-4">Are you sure?</h2>
                 <div className="sr-only" id="delete-chore-description">
                   Confirm deletion of this chore.

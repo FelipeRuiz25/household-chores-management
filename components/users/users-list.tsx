@@ -16,7 +16,7 @@ import { useChores } from "@/contexts/chores-context"
 
 export function UsersList() {
   const { users, updateUser, deleteUser, addUser } = useUsers()
-  const { chores, updateChore } = useChores()
+  const { chores, updateChore, deleteChore } = useChores()
   const [displayUsers, setDisplayUsers] = useState<User[]>([])
 
   // State for modals
@@ -112,19 +112,33 @@ export function UsersList() {
     setIsDeleteModalOpen(true)
   }
 
-  // Update the handleConfirmDelete function to store the deleted user and show a toast with undo button
+  // Update the handleConfirmDelete function to also delete assigned chores
   const handleConfirmDelete = () => {
     if (!currentUser) return
 
     // Store the user before deleting
     lastDeletedUserRef.current = { ...currentUser }
 
+    // Find all chores assigned to this user
+    const userChores = chores.filter((chore) => {
+      const choreName = chore.assignedTo.name.toLowerCase()
+      const userName = currentUser.name.toLowerCase()
+      const userFirstName = userName.split(" ")[0]
+
+      return choreName === userName || choreName === userFirstName
+    })
+
     // Delete the user
     deleteUser(currentUser.id)
 
+    // Delete all chores assigned to this user
+    userChores.forEach((chore) => {
+      deleteChore(chore.id)
+    })
+
     // Show toast with undo button
     toast(`${currentUser.name} has been removed.`, {
-      description: "The family member has been deleted.",
+      description: `The family member has been deleted${userChores.length > 0 ? ` along with ${userChores.length} assigned chore${userChores.length === 1 ? "" : "s"}` : ""}.`,
       action: {
         label: "Undo",
         onClick: () => {
@@ -139,7 +153,7 @@ export function UsersList() {
             })
 
             toast.success("User restored", {
-              description: `${userToRestore.name} has been restored.`,
+              description: `${userToRestore.name} has been restored. Note: Any deleted chores were not restored.`,
             })
 
             lastDeletedUserRef.current = null
@@ -214,10 +228,11 @@ export function UsersList() {
         {/* Edit Modal */}
         {isEditModalOpen && editFormData && (
             <div
-                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center"
+                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center overflow-y-auto"
                 aria-describedby="edit-user-description"
+                style={{ minHeight: "100vh" }}
             >
-              <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative">
+              <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative my-8 mx-auto">
                 <button
                     className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
                     onClick={() => {
@@ -308,16 +323,18 @@ export function UsersList() {
         {/* Delete Confirmation Modal */}
         {isDeleteModalOpen && currentUser && (
             <div
-                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center"
+                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center overflow-y-auto"
                 aria-describedby="delete-user-description"
+                style={{ minHeight: "100vh" }}
             >
-              <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative">
+              <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative my-8 mx-auto">
                 <h2 className="text-lg font-semibold mb-4">Are you sure?</h2>
                 <div className="sr-only" id="delete-user-description">
                   Confirm deletion of this family member.
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">
-                  This will permanently remove "{currentUser.name}" from your family members. This action cannot be undone.
+                  This will permanently remove "{currentUser.name}" from your family members and delete all chores assigned
+                  to them. This action cannot be undone.
                 </p>
 
                 <div className="flex flex-col gap-2 mt-6">

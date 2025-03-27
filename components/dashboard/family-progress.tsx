@@ -139,10 +139,11 @@ export function FamilyProgress() {
         {/* Family Member Details Modal */}
         {selectedMember && (
             <div
-                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center"
+                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center overflow-y-auto"
                 aria-describedby="member-details-description"
+                style={{ minHeight: "100vh" }}
             >
-              <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative">
+              <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative my-8 mx-auto">
                 <button
                     className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
                     onClick={closeMemberDetails}
@@ -211,10 +212,7 @@ export function FamilyProgress() {
                   )}
                 </div>
 
-                <div className="flex justify-end gap-2 mt-6">
-                  <Button variant="outline" onClick={closeMemberDetails}>
-                    Close
-                  </Button>
+                <div className="flex flex-col gap-2 mt-6">
                   <Button
                       onClick={() => {
                         closeMemberDetails()
@@ -222,6 +220,9 @@ export function FamilyProgress() {
                       }}
                   >
                     View Details
+                  </Button>
+                  <Button variant="outline" onClick={closeMemberDetails}>
+                    Close
                   </Button>
                 </div>
               </div>
