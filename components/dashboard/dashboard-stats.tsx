@@ -32,6 +32,7 @@ export function DashboardStats() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{completedChores}</div>
+                    <p className="text-xs text-muted-foreground">Total completed</p>
                 </CardContent>
             </Card>
 
@@ -45,6 +46,7 @@ export function DashboardStats() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{pendingChores}</div>
+                    <p className="text-xs text-muted-foreground">Waiting to be done</p>
                 </CardContent>
             </Card>
 
@@ -66,6 +68,7 @@ export function DashboardStats() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{completionRate}%</div>
+                    <p className="text-xs text-muted-foreground">Overall completion</p>
                 </CardContent>
             </Card>
         </div>

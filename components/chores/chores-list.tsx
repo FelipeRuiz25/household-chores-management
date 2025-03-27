@@ -48,6 +48,12 @@ export function ChoresList() {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterStatus, setFilterStatus] = useState("all")
 
+  // Function to ensure consistent date formatting
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
+  }
+
   // Modal states
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isReassignModalOpen, setIsReassignModalOpen] = useState(false)
@@ -292,7 +298,7 @@ export function ChoresList() {
                                   {chore.status === "completed" ? "Completed" : "Pending"}
                                 </Badge>
                               </TableCell>
-                              <TableCell>{new Date(chore.dueDate).toLocaleDateString()}</TableCell>
+                              <TableCell>{formatDate(chore.dueDate)}</TableCell>
                               <TableCell>
                                 <Badge
                                     variant={
@@ -380,7 +386,7 @@ export function ChoresList() {
                           </div>
                           <div>
                             <p className="text-muted-foreground">Due Date</p>
-                            <p>{new Date(chore.dueDate).toLocaleDateString()}</p>
+                            <p>{formatDate(chore.dueDate)}</p>
                           </div>
                         </div>
 
@@ -427,7 +433,10 @@ export function ChoresList() {
 
         {/* Edit Modal */}
         {isEditModalOpen && selectedChore && (
-            <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
+            <div
+                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center"
+                aria-describedby="edit-chore-description"
+            >
               <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto">
                 <button
                     className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
@@ -456,6 +465,9 @@ export function ChoresList() {
                 </button>
 
                 <h2 className="text-lg font-semibold mb-4">Edit Chore</h2>
+                <div className="sr-only" id="edit-chore-description">
+                  Make changes to the chore details.
+                </div>
                 <p className="text-sm text-muted-foreground mb-4">Make changes to the chore details below.</p>
                 <Badge
                     variant={
@@ -615,7 +627,10 @@ export function ChoresList() {
 
         {/* Reassign Modal */}
         {isReassignModalOpen && currentChore && (
-            <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
+            <div
+                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center"
+                aria-describedby="reassign-chore-description"
+            >
               <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto">
                 <button
                     className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
@@ -644,6 +659,9 @@ export function ChoresList() {
                 </button>
 
                 <h2 className="text-lg font-semibold mb-4">Reassign Chore</h2>
+                <div className="sr-only" id="reassign-chore-description">
+                  Select a new person to assign this chore to.
+                </div>
                 <p className="text-sm text-muted-foreground mb-4">
                   Select a new person to assign "{currentChore.name}" to.
                 </p>
@@ -685,9 +703,15 @@ export function ChoresList() {
 
         {/* Delete Confirmation Modal */}
         {isDeleteModalOpen && currentChore && (
-            <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
+            <div
+                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center"
+                aria-describedby="delete-chore-description"
+            >
               <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto">
                 <h2 className="text-lg font-semibold mb-4">Are you sure?</h2>
+                <div className="sr-only" id="delete-chore-description">
+                  Confirm deletion of this chore.
+                </div>
                 <p className="text-sm text-muted-foreground mb-4">
                   This will permanently delete the chore "{currentChore.name}". This action cannot be undone.
                 </p>

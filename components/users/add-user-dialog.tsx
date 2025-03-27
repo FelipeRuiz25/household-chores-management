@@ -14,7 +14,7 @@ import * as z from "zod"
 import { Save } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useUsers } from "@/contexts/users-context"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -73,6 +73,8 @@ export function AddUserDialog({ trigger, onUserAdded }: AddUserDialogProps) {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>{trigger}</DialogTrigger>
             <DialogContent className="sm:max-w-[600px] p-2 sm:p-4">
+                <DialogTitle>Add Family Member</DialogTitle>
+                <DialogDescription>Enter the details for the new family member</DialogDescription>
                 <Card className="border-0 shadow-none">
                     <CardHeader className="px-2 sm:px-4">
                         <CardTitle>Add Family Member</CardTitle>
@@ -133,7 +135,7 @@ export function AddUserDialog({ trigger, onUserAdded }: AddUserDialogProps) {
                                     )}
                                 />
                             </CardContent>
-                            <CardFooter className="flex flex-col xs:flex-row gap-2 xs:justify-between px-2 sm:px-4">
+                            <CardFooter className="flex flex-col gap-2 mt-6 px-2 sm:px-4">
                                 <Button type="button" variant="outline" onClick={() => setOpen(false)} className="w-full">
                                     Cancel
                                 </Button>

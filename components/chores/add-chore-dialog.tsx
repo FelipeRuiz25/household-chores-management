@@ -17,7 +17,7 @@ import { SimpleDatePickerV2 } from "@/components/ui/simple-date-picker-v2"
 import { useChores } from "@/contexts/chores-context"
 import { useToast } from "@/hooks/use-toast"
 import { useUsers } from "@/contexts/users-context"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -115,6 +115,8 @@ export function AddChoreDialog({ trigger, onChoreAdded }: AddChoreDialogProps) {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>{trigger}</DialogTrigger>
             <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto p-2 sm:p-4">
+                <DialogTitle>Add New Chore</DialogTitle>
+                <DialogDescription>Enter the details for the new chore</DialogDescription>
                 <Card className="border-0 shadow-none">
                     <CardHeader className="px-2 sm:px-4">
                         <CardTitle>Add New Chore</CardTitle>
@@ -244,7 +246,7 @@ export function AddChoreDialog({ trigger, onChoreAdded }: AddChoreDialogProps) {
                                     />
                                 </div>
                             </CardContent>
-                            <CardFooter className="flex flex-col xs:flex-row gap-2 xs:justify-between px-2 sm:px-4">
+                            <CardFooter className="flex flex-col gap-2 mt-6 px-2 sm:px-4">
                                 <Button type="button" variant="outline" onClick={() => setOpen(false)} className="w-full">
                                     Cancel
                                 </Button>

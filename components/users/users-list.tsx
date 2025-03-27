@@ -223,7 +223,10 @@ export function UsersList() {
 
         {/* Edit Modal */}
         {isEditModalOpen && editFormData && (
-            <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
+            <div
+                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center"
+                aria-describedby="edit-user-description"
+            >
               <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative">
                 <button
                     className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
@@ -252,6 +255,9 @@ export function UsersList() {
                 </button>
 
                 <h2 className="text-lg font-semibold mb-4">Edit Family Member</h2>
+                <div className="sr-only" id="edit-user-description">
+                  Make changes to the family member details.
+                </div>
                 <p className="text-sm text-muted-foreground mb-4">Make changes to the family member details below.</p>
 
                 <div className="grid gap-4">
@@ -311,9 +317,15 @@ export function UsersList() {
 
         {/* Delete Confirmation Modal */}
         {isDeleteModalOpen && currentUser && (
-            <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
+            <div
+                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center"
+                aria-describedby="delete-user-description"
+            >
               <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative">
                 <h2 className="text-lg font-semibold mb-4">Are you sure?</h2>
+                <div className="sr-only" id="delete-user-description">
+                  Confirm deletion of this family member.
+                </div>
                 <p className="text-sm text-muted-foreground mb-4">
                   This will permanently remove "{currentUser.name}" from your family members. This action cannot be undone.
                 </p>

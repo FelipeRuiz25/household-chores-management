@@ -32,6 +32,12 @@ export function FamilyProgress() {
   const [selectedMember, setSelectedMember] = useState<FamilyMember | null>(null)
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([])
 
+  // Function to ensure consistent date formatting
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
+  }
+
   // Calculate family progress data based on actual chores and users
   useEffect(() => {
     const updatedFamilyMembers = users.map((user) => {
@@ -59,7 +65,7 @@ export function FamilyProgress() {
           .map((chore) => ({
             id: chore.id,
             name: chore.name,
-            dueDate: new Date(chore.dueDate).toLocaleDateString(),
+            dueDate: formatDate(chore.dueDate),
           }))
 
       return {
@@ -132,7 +138,10 @@ export function FamilyProgress() {
 
         {/* Family Member Details Modal */}
         {selectedMember && (
-            <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
+            <div
+                className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center"
+                aria-describedby="member-details-description"
+            >
               <div className="bg-background border rounded-lg shadow-lg w-full max-w-md p-6 relative">
                 <button
                     className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
@@ -149,6 +158,9 @@ export function FamilyProgress() {
                   </Avatar>
                   <div>
                     <h2 className="text-xl font-semibold">{selectedMember.name}</h2>
+                    <div className="sr-only" id="member-details-description">
+                      View details about this family member's chore progress.
+                    </div>
                     <div className="flex items-center mt-1">
                       <Progress value={selectedMember.progress} className="h-2 w-24 mr-2" />
                       <span className="text-sm font-medium">{selectedMember.progress}% complete</span>
