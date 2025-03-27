@@ -365,7 +365,7 @@ export function UsersList() {
                   Confirm deletion of this family member.
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">
-                  This will permanently remove "{currentUser.name}" from your family members and delete all chores assigned
+                  This will remove "{currentUser.name}" from your family members and delete all chores assigned
                   to them.
                 </p>
 

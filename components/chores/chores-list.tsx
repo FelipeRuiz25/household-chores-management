@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge-custom"
 import { Button } from "@/components/ui/button"
@@ -50,8 +50,16 @@ export function ChoresList() {
 
   // Function to ensure consistent date formatting
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) {
+        return "Invalid date"
+      }
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
+    } catch (error) {
+      console.error("Date formatting error:", error)
+      return "Invalid date"
+    }
   }
 
   // Modal states
@@ -201,6 +209,8 @@ export function ChoresList() {
             const choreToRestore = lastDeletedChoreRef.current
             // Add the chore back
             addChore({
+              id: choreToRestore.id,
+              status: choreToRestore.status,
               name: choreToRestore.name,
               description: choreToRestore.description,
               frequency: choreToRestore.frequency,
@@ -228,17 +238,16 @@ export function ChoresList() {
       <div className="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>All Chores</CardTitle>
             <CardDescription>Manage and track all household chores</CardDescription>
-            <div className="flex flex-col space-y-2 mt-4">
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
               <Input
                   placeholder="Search chores..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full"
+                  className="w-full sm:w-auto sm:flex-1"
               />
               <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full sm:w-[180px]">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -338,7 +347,7 @@ export function ChoresList() {
             </div>
 
             {/* Mobile view - card-based layout */}
-            <div className="md:hidden space-y-4">
+            <div className="md:hidden space-y-6">
               {filteredChores.length === 0 ? (
                   <div className="text-center py-4 text-muted-foreground">
                     No chores found. Try adjusting your search or filter.
@@ -730,7 +739,7 @@ export function ChoresList() {
                   Confirm deletion of this chore.
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">
-                  This will permanently delete the chore "{currentChore.name}". This action cannot be undone.
+                  This will delete the chore "{currentChore.name}".
                 </p>
 
                 <div className="flex flex-col gap-2 mt-6">
