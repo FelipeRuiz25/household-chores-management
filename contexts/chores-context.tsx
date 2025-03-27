@@ -96,7 +96,7 @@ const initialChores: Chore[] = [
 
 type ChoresContextType = {
   chores: Chore[]
-  addChore: (chore: Omit<Chore, "id" | "status">) => void
+  addChore: (chore: Chore) => Chore
   updateChore: (id: number, chore: Partial<Chore>) => void
   deleteChore: (id: number) => void
   getChoreById: (id: number) => Chore | undefined
@@ -107,14 +107,16 @@ const ChoresContext = createContext<ChoresContextType | undefined>(undefined)
 export function ChoresProvider({ children }: { children: ReactNode }) {
   const [chores, setChores] = useState<Chore[]>(initialChores)
 
-  const addChore = (choreData: Omit<Chore, "id" | "status">) => {
+  const addChore = (choreData: Chore) => {
     // Generate a new ID (in a real app, this would come from the backend)
-    const newId = Math.max(...chores.map((chore) => chore.id), 0) + 1
+    let newId = choreData.id
+    if(choreData.id == 0){
+      newId = Math.max(...chores.map((chore) => chore.id), 0) + 1
+    }
 
     const newChore: Chore = {
-      id: newId,
-      status: "pending",
       ...choreData,
+      id: newId,
     }
 
     setChores((prevChores) => [...prevChores, newChore])

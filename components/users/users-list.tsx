@@ -12,11 +12,11 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
 import { useUsers, type User } from "@/contexts/users-context"
-import { useChores } from "@/contexts/chores-context"
+import { useChores, type Chore } from "@/contexts/chores-context"
 
 export function UsersList() {
   const { users, updateUser, deleteUser, addUser } = useUsers()
-  const { chores, updateChore, deleteChore } = useChores()
+  const { chores, updateChore, deleteChore, addChore } = useChores()
   const [displayUsers, setDisplayUsers] = useState<User[]>([])
 
   // State for modals
@@ -25,8 +25,9 @@ export function UsersList() {
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [editFormData, setEditFormData] = useState<Partial<User> | null>(null)
 
-  // Store the last deleted user for undo functionality
+  // Add a new ref to store deleted user and chores
   const lastDeletedUserRef = useRef<User | null>(null)
+  const lastDeletedChoresRef = useRef<Chore[]>([])
 
   // Update user stats based on chores data
   useEffect(() => {
@@ -112,7 +113,7 @@ export function UsersList() {
     setIsDeleteModalOpen(true)
   }
 
-  // Update the handleConfirmDelete function to also delete assigned chores
+  // Update the handleConfirmDelete function to correctly restore each chore with its original status
   const handleConfirmDelete = () => {
     if (!currentUser) return
 
@@ -127,6 +128,9 @@ export function UsersList() {
 
       return choreName === userName || choreName === userFirstName
     })
+
+    // Make a deep copy of the chores before deleting them
+    lastDeletedChoresRef.current = userChores.map((chore) => ({ ...chore }))
 
     // Delete the user
     deleteUser(currentUser.id)
@@ -145,6 +149,7 @@ export function UsersList() {
           // Restore the user if undo is clicked
           if (lastDeletedUserRef.current) {
             const userToRestore = lastDeletedUserRef.current
+
             // Add the user back to the context
             addUser({
               name: userToRestore.name,
@@ -152,11 +157,42 @@ export function UsersList() {
               role: userToRestore.role,
             })
 
+            // Restore the deleted chores with their original status
+            if (lastDeletedChoresRef.current.length > 0) {
+              // Process each chore individually
+              const restoredChores = lastDeletedChoresRef.current.map((chore) => {
+                // Create a new chore with all the original properties
+                const newChore = addChore({
+                  name: chore.name,
+                  description: chore.description,
+                  frequency: chore.frequency,
+                  dueDate: chore.dueDate,
+                  assignedTo: chore.assignedTo,
+                  priority: chore.priority,
+                  status: chore.status,
+                  id: chore.id
+                })
+
+                // If the chore was completed, update its status
+                if (newChore && chore.status === "completed") {
+                  updateChore(newChore.id, { status: "completed" })
+                  return { ...newChore, status: "completed" }
+                }
+
+                return newChore
+              })
+
+              // Log for debugging
+              console.log("Original chores:", lastDeletedChoresRef.current)
+              console.log("Restored chores:", restoredChores)
+            }
+
             toast.success("User restored", {
-              description: `${userToRestore.name} has been restored. Note: Any deleted chores were not restored.`,
+              description: `${userToRestore.name} has been restored with ${lastDeletedChoresRef.current.length} assigned chore(s).`,
             })
 
             lastDeletedUserRef.current = null
+            lastDeletedChoresRef.current = []
           }
         },
       },
@@ -334,7 +370,7 @@ export function UsersList() {
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">
                   This will permanently remove "{currentUser.name}" from your family members and delete all chores assigned
-                  to them. This action cannot be undone.
+                  to them.
                 </p>
 
                 <div className="flex flex-col gap-2 mt-6">

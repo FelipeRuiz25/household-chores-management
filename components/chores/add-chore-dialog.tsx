@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -16,7 +16,14 @@ import { Save } from "lucide-react"
 import { SimpleDatePickerV2 } from "@/components/ui/simple-date-picker-v2"
 import { useChores } from "@/contexts/chores-context"
 import { useUsers } from "@/contexts/users-context"
-import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import {
+    Dialog,
+    DialogContent,
+    DialogTrigger,
+    DialogTitle,
+    DialogDescription,
+    DialogHeader,
+} from "@/components/ui/dialog"
 import { toast } from "sonner"
 
 const formSchema = z.object({
@@ -81,6 +88,8 @@ export function AddChoreDialog({ trigger, onChoreAdded }: AddChoreDialogProps) {
 
         // Add the new chore
         const newChore = addChore({
+            id:0,
+            status: "pending",
             name: values.name,
             description: values.description,
             frequency: values.frequency,
@@ -111,63 +120,23 @@ export function AddChoreDialog({ trigger, onChoreAdded }: AddChoreDialogProps) {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>{trigger}</DialogTrigger>
             <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto p-2 sm:p-4">
-                <DialogTitle>Add New Chore</DialogTitle>
-                <DialogDescription>Enter the details for the new chore</DialogDescription>
+                <DialogHeader className="text-left px-2 sm:px-4">
+                    <DialogTitle>Add New Chore</DialogTitle>
+                    <DialogDescription>Enter the details for the new chore</DialogDescription>
+                </DialogHeader>
                 <Card className="border-0 shadow-none">
-                    <CardHeader className="px-2 sm:px-4">
-                        <CardTitle>Add New Chore</CardTitle>
-                        <CardDescription>Enter the details for the new chore</CardDescription>
-                    </CardHeader>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)}>
-                            <CardContent className="space-y-4 px-2 sm:px-4">
-                                <FormField
-                                    control={form.control}
-                                    name="name"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Chore Name</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="Enter chore name" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="description"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Description</FormLabel>
-                                            <FormControl>
-                                                <Textarea placeholder="Enter chore description" className="min-h-[100px]" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <div className="grid grid-cols-1 gap-4">
+                    <CardContent className="space-y-4 px-2 sm:px-4 pt-4">
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)}>
+                                <div className="space-y-4">
                                     <FormField
                                         control={form.control}
-                                        name="frequency"
+                                        name="name"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Frequency</FormLabel>
+                                                <FormLabel>Chore Name</FormLabel>
                                                 <FormControl>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Select frequency" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectItem value="Daily">Daily</SelectItem>
-                                                            <SelectItem value="Weekly">Weekly</SelectItem>
-                                                            <SelectItem value="Bi-weekly">Bi-weekly</SelectItem>
-                                                            <SelectItem value="Monthly">Monthly</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
+                                                    <Input placeholder="Enter chore name" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -176,89 +145,129 @@ export function AddChoreDialog({ trigger, onChoreAdded }: AddChoreDialogProps) {
 
                                     <FormField
                                         control={form.control}
-                                        name="assignedTo"
+                                        name="description"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Assign To</FormLabel>
+                                                <FormLabel>Description</FormLabel>
                                                 <FormControl>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Select family member" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {users.map((user) => (
-                                                                <SelectItem key={user.id} value={user.id.toString()}>
-                                                                    {user.name}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
+                                                    <Textarea placeholder="Enter chore description" className="min-h-[100px]" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
                                     />
 
-                                    <FormField
-                                        control={form.control}
-                                        name="priority"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Priority</FormLabel>
-                                                <FormControl>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Select priority" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectItem value="low">Low</SelectItem>
-                                                            <SelectItem value="medium">Medium</SelectItem>
-                                                            <SelectItem value="high">High</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                    <div className="grid grid-cols-1 gap-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="frequency"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Frequency</FormLabel>
+                                                    <FormControl>
+                                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select frequency" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="Daily">Daily</SelectItem>
+                                                                <SelectItem value="Weekly">Weekly</SelectItem>
+                                                                <SelectItem value="Bi-weekly">Bi-weekly</SelectItem>
+                                                                <SelectItem value="Monthly">Monthly</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
 
-                                    <FormField
-                                        control={form.control}
-                                        name="dueDate"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Due Date</FormLabel>
-                                                <FormControl>
-                                                    <SimpleDatePickerV2
-                                                        date={field.value}
-                                                        setDate={(date) => {
-                                                            field.onChange(date)
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                        <FormField
+                                            control={form.control}
+                                            name="assignedTo"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Assign To</FormLabel>
+                                                    <FormControl>
+                                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select family member" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {users.map((user) => (
+                                                                    <SelectItem key={user.id} value={user.id.toString()}>
+                                                                        {user.name}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="priority"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Priority</FormLabel>
+                                                    <FormControl>
+                                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select priority" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="low">Low</SelectItem>
+                                                                <SelectItem value="medium">Medium</SelectItem>
+                                                                <SelectItem value="high">High</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="dueDate"
+                                            render={({ field }) => (
+                                                <FormItem className="mb-6">
+                                                    <FormLabel>Due Date</FormLabel>
+                                                    <FormControl>
+                                                        <SimpleDatePickerV2
+                                                            date={field.value}
+                                                            setDate={(date) => {
+                                                                field.onChange(date)
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
                                 </div>
-                            </CardContent>
-                            <CardFooter className="flex flex-col gap-2 mt-6 px-2 sm:px-4">
-                                <Button type="button" variant="outline" onClick={() => setOpen(false)} className="w-full">
-                                    Cancel
-                                </Button>
-                                <Button type="submit" disabled={isSubmitting} className="w-full">
-                                    {isSubmitting ? (
-                                        <>Saving...</>
-                                    ) : (
-                                        <>
-                                            <Save className="mr-2 h-4 w-4" />
-                                            Save Chore
-                                        </>
-                                    )}
-                                </Button>
-                            </CardFooter>
-                        </form>
-                    </Form>
+                                <div className="flex flex-col gap-2">
+                                    <Button type="button" variant="outline" onClick={() => setOpen(false)} className="w-full">
+                                        Cancel
+                                    </Button>
+                                    <Button type="submit" disabled={isSubmitting} className="w-full">
+                                        {isSubmitting ? (
+                                            <>Saving...</>
+                                        ) : (
+                                            <>
+                                                <Save className="mr-2 h-4 w-4" />
+                                                Save Chore
+                                            </>
+                                        )}
+                                    </Button>
+                                </div>
+                            </form>
+                        </Form>
+                    </CardContent>
                 </Card>
             </DialogContent>
         </Dialog>
