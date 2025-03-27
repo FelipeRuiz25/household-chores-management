@@ -86,7 +86,7 @@ export function AddUserDialog({ trigger, onUserAdded }: AddUserDialogProps) {
                     <CardContent className="space-y-4 px-2 sm:px-4 pt-4">
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)}>
-                                <div className="space-y-4">
+                                <div className="space-y-4 mb-8">
                                     <FormField
                                         control={form.control}
                                         name="name"
@@ -120,7 +120,7 @@ export function AddUserDialog({ trigger, onUserAdded }: AddUserDialogProps) {
                                         control={form.control}
                                         name="role"
                                         render={({ field }) => (
-                                            <FormItem className="mb-6">
+                                            <FormItem>
                                                 <FormLabel>Role</FormLabel>
                                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                     <FormControl>
@@ -139,7 +139,7 @@ export function AddUserDialog({ trigger, onUserAdded }: AddUserDialogProps) {
                                         )}
                                     />
                                 </div>
-                                <div className="flex flex-col gap-2">
+                                <div className="flex flex-col gap-2 mt-4">
                                     <Button type="button" variant="outline" onClick={() => setOpen(false)} className="w-full">
                                         Cancel
                                     </Button>
