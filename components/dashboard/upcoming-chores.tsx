@@ -249,17 +249,17 @@ export function UpcomingChores() {
                           }`}
                           onClick={() => openChoreDetails(chore)}
                       >
-                        <div className="flex items-center space-x-4">
-                          <Avatar className="h-8 w-8">
+                        <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
+                          <Avatar className="h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0">
                             <AvatarImage src={chore.assignedTo.avatar} alt={chore.assignedTo.name} />
                             <AvatarFallback>{chore.assignedTo.initials}</AvatarFallback>
                           </Avatar>
-                          <div>
-                            <p className="text-sm font-medium">{chore.name}</p>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium truncate">{chore.name}</p>
                             <p className="text-xs text-muted-foreground">Due: {chore.dueDate}</p>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0 ml-2">
                           <Badge
                               variant={
                                 chore.priority === "high"
@@ -268,13 +268,14 @@ export function UpcomingChores() {
                                         ? "warning"
                                         : "secondary"
                               }
+                              className="text-xs"
                           >
                             {chore.priority}
                           </Badge>
                           <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 hover:bg-green-100 hover:text-green-600 dark:hover:bg-green-900 dark:hover:text-green-400 transition-colors"
+                              className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-green-100 hover:text-green-600 dark:hover:bg-green-900 dark:hover:text-green-400 transition-colors"
                               onClick={(e) => handleCompleteChore(chore.id, e)}
                               aria-label={`Mark ${chore.name} as complete`}
                           >

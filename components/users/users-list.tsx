@@ -168,21 +168,21 @@ export function UsersList() {
         <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {displayUsers.map((user) => (
               <Card key={user.id}>
-                <CardHeader className="flex flex-row items-center gap-4 pb-2">
-                  <Avatar className="h-12 w-12">
+                <CardHeader className="flex flex-row items-center gap-2 sm:gap-4 pb-2">
+                  <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
                     <AvatarImage src={user.avatar} alt={user.name} />
                     <AvatarFallback>{user.initials}</AvatarFallback>
                   </Avatar>
-                  <div className="grid gap-1">
-                    <CardTitle className="text-lg">{user.name}</CardTitle>
-                    <CardDescription>{user.email}</CardDescription>
+                  <div className="grid gap-1 min-w-0 flex-1">
+                    <CardTitle className="text-base sm:text-lg truncate">{user.name}</CardTitle>
+                    <CardDescription className="truncate">{user.email}</CardDescription>
                     <Badge className="w-fit capitalize" variant={user.role === "parent" ? "default" : "secondary"}>
                       {user.role}
                     </Badge>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0 ml-auto">
+                      <Button variant="ghost" className="h-8 w-8 p-0">
                         <span className="sr-only">Open menu</span>
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
@@ -201,13 +201,13 @@ export function UsersList() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-2">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between px-1">
                       <span className="text-sm text-muted-foreground">Completed Chores</span>
-                      <span className="text-sm font-medium">{user.completedChores}</span>
+                      <span className="text-sm font-medium w-6 text-center">{user.completedChores}</span>
                     </div>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between px-1">
                       <span className="text-sm text-muted-foreground">Pending Chores</span>
-                      <span className="text-sm font-medium">{user.pendingChores}</span>
+                      <span className="text-sm font-medium w-6 text-center">{user.pendingChores}</span>
                     </div>
                     {user.completedChores > 7 && (
                         <div className="flex items-center mt-2 text-amber-500">
@@ -292,7 +292,7 @@ export function UsersList() {
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-2 mt-6">
+                <div className="flex flex-col gap-2 mt-6">
                   <Button
                       variant="outline"
                       onClick={() => {
@@ -318,7 +318,7 @@ export function UsersList() {
                   This will permanently remove "{currentUser.name}" from your family members. This action cannot be undone.
                 </p>
 
-                <div className="flex justify-end gap-2 mt-6">
+                <div className="flex flex-col gap-2 mt-6">
                   <Button
                       variant="outline"
                       onClick={() => {

@@ -40,7 +40,7 @@ export function CustomDatePicker({ date, setDate }: CustomDatePickerProps) {
   // Add days from next month to complete the grid
   const totalDaysDisplayed = Math.ceil((monthDays.length + startDay) / 7) * 7
   const nextMonthDays = Array.from({ length: totalDaysDisplayed - (monthDays.length + startDay) }, (_, i) =>
-    addDays(monthEnd, i + 1),
+      addDays(monthEnd, i + 1),
   )
 
   // All days to display
@@ -127,73 +127,73 @@ export function CustomDatePicker({ date, setDate }: CustomDatePickerProps) {
   }, [isOpen, updatePosition])
 
   return (
-    <div className="relative" ref={containerRef}>
-      <Button
-        ref={buttonRef}
-        type="button" // Important: prevent form submission
-        variant="outline"
-        className="w-full justify-start text-left font-normal h-10"
-        onClick={toggleCalendar}
-      >
-        <CalendarIcon className="mr-2 h-4 w-4" />
-        {date ? format(date, "PPP") : <span>Pick a date</span>}
-      </Button>
-
-      {isOpen && (
-        <div
-          className={cn(
-            "absolute z-50 rounded-md border bg-background shadow-md p-3 w-[280px]",
-            position === "top" ? "bottom-full mb-2" : "top-full mt-2",
-          )}
-          onClick={(e) => e.stopPropagation()}
+      <div className="relative" ref={containerRef}>
+        <Button
+            ref={buttonRef}
+            type="button" // Important: prevent form submission
+            variant="outline"
+            className="w-full justify-start text-left font-normal h-10"
+            onClick={toggleCalendar}
         >
-          <div className="flex justify-between items-center mb-2">
-            <Button type="button" variant="ghost" size="icon" onClick={prevMonth}>
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <div className="font-medium">{format(currentMonth, "MMMM yyyy")}</div>
-            <Button type="button" variant="ghost" size="icon" onClick={nextMonth}>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {date ? format(date, "PPP") : <span>Pick a date</span>}
+        </Button>
 
-          <div className="grid grid-cols-7 gap-1">
-            {/* Week days header */}
-            {weekDays.map((day) => (
-              <div
-                key={day}
-                className="text-center text-xs font-medium text-muted-foreground h-8 flex items-center justify-center"
-              >
-                {day}
-              </div>
-            ))}
-
-            {/* Calendar days */}
-            {allDays.map((day, i) => {
-              const isCurrentMonth = isSameMonth(day, currentMonth)
-              const isSelected = date ? isSameDay(day, date) : false
-
-              return (
-                <Button
-                  key={i}
-                  type="button" // Important: prevent form submission
-                  variant="ghost"
-                  size="icon"
-                  className={cn(
-                    "h-8 w-8 p-0 font-normal",
-                    !isCurrentMonth && "text-muted-foreground opacity-50",
-                    isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
-                  )}
-                  onClick={(e) => handleSelectDate(day, e)}
-                >
-                  {format(day, "d")}
+        {isOpen && (
+            <div
+                className={cn(
+                    "absolute z-50 rounded-md border bg-background shadow-md p-3 max-w-[280px] w-full",
+                    position === "top" ? "bottom-full mb-2" : "top-full mt-2",
+                )}
+                onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-center mb-2">
+                <Button type="button" variant="ghost" size="icon" onClick={prevMonth}>
+                  <ChevronLeft className="h-4 w-4" />
                 </Button>
-              )
-            })}
-          </div>
-        </div>
-      )}
-    </div>
+                <div className="font-medium">{format(currentMonth, "MMMM yyyy")}</div>
+                <Button type="button" variant="ghost" size="icon" onClick={nextMonth}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-7 gap-1">
+                {/* Week days header */}
+                {weekDays.map((day) => (
+                    <div
+                        key={day}
+                        className="text-center text-xs font-medium text-muted-foreground h-8 flex items-center justify-center"
+                    >
+                      {day}
+                    </div>
+                ))}
+
+                {/* Calendar days */}
+                {allDays.map((day, i) => {
+                  const isCurrentMonth = isSameMonth(day, currentMonth)
+                  const isSelected = date ? isSameDay(day, date) : false
+
+                  return (
+                      <Button
+                          key={i}
+                          type="button" // Important: prevent form submission
+                          variant="ghost"
+                          size="icon"
+                          className={cn(
+                              "h-8 w-8 p-0 font-normal",
+                              !isCurrentMonth && "text-muted-foreground opacity-50",
+                              isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
+                          )}
+                          onClick={(e) => handleSelectDate(day, e)}
+                      >
+                        {format(day, "d")}
+                      </Button>
+                  )
+                })}
+              </div>
+            </div>
+        )}
+      </div>
   )
 }
 

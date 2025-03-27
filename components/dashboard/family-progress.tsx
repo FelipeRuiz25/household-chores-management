@@ -34,10 +34,6 @@ export function FamilyProgress() {
 
   // Calculate family progress data based on actual chores and users
   useEffect(() => {
-    // Debug logs to help identify the issue
-    console.log("Users:", users)
-    console.log("Chores:", chores)
-
     const updatedFamilyMembers = users.map((user) => {
       // Find all chores assigned to this user - using a more flexible matching approach
       const userChores = chores.filter((chore) => {
@@ -49,9 +45,6 @@ export function FamilyProgress() {
 
         return choreName === userName || choreName === userFirstName
       })
-
-      // Debug log for each user's chores
-      console.log(`Chores for ${user.name}:`, userChores)
 
       // Count completed and total chores
       const completedChores = userChores.filter((chore) => chore.status === "completed").length
@@ -107,27 +100,28 @@ export function FamilyProgress() {
             </Button>
           </CardHeader>
           <CardContent>
+            {/* Adjust the progress items for small screens */}
             <div className="space-y-6">
               {familyMembers.map((member) => (
                   <div
                       key={member.id}
-                      className="space-y-2 cursor-pointer hover:bg-muted/50 p-3 rounded-md"
+                      className="space-y-2 cursor-pointer hover:bg-muted/50 p-2 sm:p-3 rounded-md"
                       onClick={() => openMemberDetails(member)}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <Avatar className="h-8 w-8">
+                      <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
+                        <Avatar className="h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0">
                           <AvatarImage src={member.avatar} alt={member.name} />
                           <AvatarFallback>{member.initials}</AvatarFallback>
                         </Avatar>
-                        <div>
-                          <p className="text-sm font-medium">{member.name}</p>
-                          <p className="text-xs text-muted-foreground">
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium truncate">{member.name}</p>
+                          <p className="text-xs text-muted-foreground truncate">
                             {member.completedChores} of {member.totalChores} chores completed
                           </p>
                         </div>
                       </div>
-                      <span className="text-sm font-medium">{member.progress}%</span>
+                      <span className="text-sm font-medium ml-2">{member.progress}%</span>
                     </div>
                     <Progress value={member.progress} className="h-2" />
                   </div>

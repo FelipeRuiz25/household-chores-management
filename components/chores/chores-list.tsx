@@ -231,15 +231,15 @@ export function ChoresList() {
           <CardHeader>
             <CardTitle>All Chores</CardTitle>
             <CardDescription>Manage and track all household chores</CardDescription>
-            <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0 mt-4">
+            <div className="flex flex-col space-y-2 mt-4">
               <Input
                   placeholder="Search chores..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full sm:max-w-sm"
+                  className="w-full"
               />
               <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -250,89 +250,177 @@ export function ChoresList() {
               </Select>
             </div>
           </CardHeader>
-          <CardContent className="overflow-x-auto">
-            <div className="min-w-[700px]">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Frequency</TableHead>
-                    <TableHead>Assigned To</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Due Date</TableHead>
-                    <TableHead>Priority</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredChores.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
-                          No chores found. Try adjusting your search or filter.
-                        </TableCell>
-                      </TableRow>
-                  ) : (
-                      filteredChores.map((chore) => (
-                          <TableRow key={chore.id}>
-                            <TableCell className="font-medium">{chore.name}</TableCell>
-                            <TableCell>{chore.frequency}</TableCell>
-                            <TableCell>
-                              <div className="flex items-center space-x-2">
-                                <Avatar className="h-8 w-8">
-                                  <AvatarImage src={chore.assignedTo.avatar} alt={chore.assignedTo.name} />
-                                  <AvatarFallback>{chore.assignedTo.initials}</AvatarFallback>
-                                </Avatar>
-                                <span>{chore.assignedTo.name}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant={chore.status === "completed" ? "success" : "warning"}>
-                                {chore.status === "completed" ? "Completed" : "Pending"}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>{new Date(chore.dueDate).toLocaleDateString()}</TableCell>
-                            <TableCell>
-                              <Badge
-                                  variant={
-                                    chore.priority === "high"
-                                        ? "destructive"
-                                        : chore.priority === "medium"
-                                            ? "warning"
-                                            : "secondary"
-                                  }
-                              >
-                                {chore.priority}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" className="h-8 w-8 p-0">
-                                    <span className="sr-only">Open menu</span>
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => handleEditChore(chore)}>
-                                    <Pencil className="mr-2 h-4 w-4" />
-                                    <span>Edit</span>
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => handleReassignChore(chore)}>
-                                    <UserPlus className="mr-2 h-4 w-4" />
-                                    <span>Reassign</span>
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => handleDeleteChore(chore)}>
-                                    <Trash className="mr-2 h-4 w-4" />
-                                    <span>Delete</span>
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </TableCell>
-                          </TableRow>
-                      ))
-                  )}
-                </TableBody>
-              </Table>
+          <CardContent>
+            {/* Desktop view - traditional table with horizontal scroll */}
+            <div className="hidden md:block overflow-x-auto">
+              <div className="min-w-[700px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Frequency</TableHead>
+                      <TableHead>Assigned To</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Due Date</TableHead>
+                      <TableHead>Priority</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredChores.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
+                            No chores found. Try adjusting your search or filter.
+                          </TableCell>
+                        </TableRow>
+                    ) : (
+                        filteredChores.map((chore) => (
+                            <TableRow key={chore.id}>
+                              <TableCell className="font-medium">{chore.name}</TableCell>
+                              <TableCell>{chore.frequency}</TableCell>
+                              <TableCell>
+                                <div className="flex items-center space-x-2">
+                                  <Avatar className="h-8 w-8">
+                                    <AvatarImage src={chore.assignedTo.avatar} alt={chore.assignedTo.name} />
+                                    <AvatarFallback>{chore.assignedTo.initials}</AvatarFallback>
+                                  </Avatar>
+                                  <span>{chore.assignedTo.name}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant={chore.status === "completed" ? "success" : "warning"}>
+                                  {chore.status === "completed" ? "Completed" : "Pending"}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>{new Date(chore.dueDate).toLocaleDateString()}</TableCell>
+                              <TableCell>
+                                <Badge
+                                    variant={
+                                      chore.priority === "high"
+                                          ? "destructive"
+                                          : chore.priority === "medium"
+                                              ? "warning"
+                                              : "secondary"
+                                    }
+                                >
+                                  {chore.priority}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="h-8 w-8 p-0">
+                                      <span className="sr-only">Open menu</span>
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={() => handleEditChore(chore)}>
+                                      <Pencil className="mr-2 h-4 w-4" />
+                                      <span>Edit</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleReassignChore(chore)}>
+                                      <UserPlus className="mr-2 h-4 w-4" />
+                                      <span>Reassign</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleDeleteChore(chore)}>
+                                      <Trash className="mr-2 h-4 w-4" />
+                                      <span>Delete</span>
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </TableCell>
+                            </TableRow>
+                        ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+
+            {/* Mobile view - card-based layout */}
+            <div className="md:hidden space-y-4">
+              {filteredChores.length === 0 ? (
+                  <div className="text-center py-4 text-muted-foreground">
+                    No chores found. Try adjusting your search or filter.
+                  </div>
+              ) : (
+                  filteredChores.map((chore) => (
+                      <div key={chore.id} className="border rounded-lg p-4 space-y-3">
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-medium">{chore.name}</h3>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleEditChore(chore)}>
+                                <Pencil className="mr-2 h-4 w-4" />
+                                <span>Edit</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleReassignChore(chore)}>
+                                <UserPlus className="mr-2 h-4 w-4" />
+                                <span>Reassign</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleDeleteChore(chore)}>
+                                <Trash className="mr-2 h-4 w-4" />
+                                <span>Delete</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div>
+                            <p className="text-muted-foreground">Frequency</p>
+                            <p>{chore.frequency}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Due Date</p>
+                            <p>{new Date(chore.dueDate).toLocaleDateString()}</p>
+                          </div>
+                        </div>
+
+                        <div>
+                          <p className="text-muted-foreground text-sm">Assigned To</p>
+                          <div className="flex items-center space-x-2 mt-1">
+                            <Avatar className="h-6 w-6">
+                              <AvatarImage src={chore.assignedTo.avatar} alt={chore.assignedTo.name} />
+                              <AvatarFallback>{chore.assignedTo.initials}</AvatarFallback>
+                            </Avatar>
+                            <span className="text-sm">{chore.assignedTo.name}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <p className="text-muted-foreground text-sm">Status</p>
+                            <Badge variant={chore.status === "completed" ? "success" : "warning"} className="mt-1">
+                              {chore.status === "completed" ? "Completed" : "Pending"}
+                            </Badge>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground text-sm">Priority</p>
+                            <Badge
+                                variant={
+                                  chore.priority === "high"
+                                      ? "destructive"
+                                      : chore.priority === "medium"
+                                          ? "warning"
+                                          : "secondary"
+                                }
+                                className="mt-1"
+                            >
+                              {chore.priority}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                  ))
+              )}
             </div>
           </CardContent>
         </Card>
@@ -460,7 +548,8 @@ export function ChoresList() {
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* Changed from grid to flex column for priority and due date */}
+                    <div className="space-y-4">
                       <FormField
                           control={editForm.control}
                           name="priority"
@@ -504,7 +593,7 @@ export function ChoresList() {
                       />
                     </div>
 
-                    <div className="flex justify-end gap-2 mt-6">
+                    <div className="flex flex-col gap-2 mt-6">
                       <Button
                           type="button"
                           variant="outline"
@@ -577,7 +666,7 @@ export function ChoresList() {
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-2 mt-6">
+                <div className="flex flex-col gap-2 mt-6">
                   <Button
                       variant="outline"
                       onClick={() => {
@@ -603,7 +692,7 @@ export function ChoresList() {
                   This will permanently delete the chore "{currentChore.name}". This action cannot be undone.
                 </p>
 
-                <div className="flex justify-end gap-2 mt-6">
+                <div className="flex flex-col gap-2 mt-6">
                   <Button
                       variant="outline"
                       onClick={() => {

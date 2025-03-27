@@ -19,14 +19,9 @@ export function DashboardStats() {
     const totalChores = chores.length
     const completionRate = totalChores > 0 ? Math.round((completedChores / totalChores) * 100) : 0
 
-    // Calculate change from "last week" (simulated)
-    // In a real app, you would compare with historical data
-    const completedChange = "+5"
-    const pendingChange = "-2"
-    const completionRateChange = "+2%"
-
+    // Adjust the grid to stack on very small screens
     return (
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 grid-cols-1 xs:grid-cols-2 lg:grid-cols-4">
             <Card
                 className="cursor-pointer hover:shadow-md transition-shadow"
                 onClick={() => router.push("/chores?filter=completed")}
@@ -37,7 +32,6 @@ export function DashboardStats() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{completedChores}</div>
-                    <p className="text-xs text-muted-foreground">Total completed</p>
                 </CardContent>
             </Card>
 
@@ -51,7 +45,6 @@ export function DashboardStats() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{pendingChores}</div>
-                    <p className="text-xs text-muted-foreground">Waiting to be done</p>
                 </CardContent>
             </Card>
 
@@ -73,7 +66,6 @@ export function DashboardStats() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{completionRate}%</div>
-                    <p className="text-xs text-muted-foreground">Overall completion</p>
                 </CardContent>
             </Card>
         </div>

@@ -114,15 +114,15 @@ export function AddChoreDialog({ trigger, onChoreAdded }: AddChoreDialogProps) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>{trigger}</DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto p-2 sm:p-4">
                 <Card className="border-0 shadow-none">
-                    <CardHeader>
+                    <CardHeader className="px-2 sm:px-4">
                         <CardTitle>Add New Chore</CardTitle>
                         <CardDescription>Enter the details for the new chore</CardDescription>
                     </CardHeader>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)}>
-                            <CardContent className="space-y-4">
+                            <CardContent className="space-y-4 px-2 sm:px-4">
                                 <FormField
                                     control={form.control}
                                     name="name"
@@ -151,7 +151,7 @@ export function AddChoreDialog({ trigger, onChoreAdded }: AddChoreDialogProps) {
                                     )}
                                 />
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4">
                                     <FormField
                                         control={form.control}
                                         name="frequency"
@@ -244,11 +244,11 @@ export function AddChoreDialog({ trigger, onChoreAdded }: AddChoreDialogProps) {
                                     />
                                 </div>
                             </CardContent>
-                            <CardFooter className="flex justify-between">
-                                <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                            <CardFooter className="flex flex-col xs:flex-row gap-2 xs:justify-between px-2 sm:px-4">
+                                <Button type="button" variant="outline" onClick={() => setOpen(false)} className="w-full">
                                     Cancel
                                 </Button>
-                                <Button type="submit" disabled={isSubmitting}>
+                                <Button type="submit" disabled={isSubmitting} className="w-full">
                                     {isSubmitting ? (
                                         <>Saving...</>
                                     ) : (
