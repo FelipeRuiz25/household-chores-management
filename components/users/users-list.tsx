@@ -181,10 +181,6 @@ export function UsersList() {
 
                 return newChore
               })
-
-              // Log for debugging
-              console.log("Original chores:", lastDeletedChoresRef.current)
-              console.log("Restored chores:", restoredChores)
             }
 
             toast.success("User restored", {
